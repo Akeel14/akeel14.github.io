@@ -1101,10 +1101,10 @@ function normTeam(sp, abbr) {
 
 function normPlayerName(s) {
   return String(s || '')
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9 ]/g, '')
-    .replace(/(jr|sr|ii|iii|iv)/g, '')
+    .replace(/\b(jr|sr|ii|iii|iv)\b/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -1363,18 +1363,24 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
   return payloadObj;
 }
 
+const isCloudStatic = location.hostname.endsWith('github.io');
+
 async function fetchDateJson(dt) {
   let json = null;
-  let usedStaticFallback = false;
-  try {
-    const res = await fetch('/api/live?date=' + encodeURIComponent(dt) + '&t=' + Date.now());
-    if (res.ok) {
-      const ct = res.headers.get('content-type') || '';
-      if (ct.includes('json')) {
-        json = await res.json();
+  let usedStaticFallback = isCloudStatic;
+  if (!isCloudStatic) {
+    try {
+      const res = await fetch('/api/live?date=' + encodeURIComponent(dt) + '&t=' + Date.now());
+      if (res.ok) {
+        const ct = res.headers.get('content-type') || '';
+        if (ct.includes('json')) {
+          json = await res.json();
+        }
       }
+    } catch (e) {
+      usedStaticFallback = true;
     }
-  } catch (e) {}
+  }
 
   if (!json) {
     usedStaticFallback = true;

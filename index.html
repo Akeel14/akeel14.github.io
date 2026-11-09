@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Live Parlays</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #090a0c;
+    --card: #121418;
+    --card-border: rgba(255, 255, 255, 0.07);
+    --text: #f4f4f6;
+    --muted: #8a8f98;
+    --green: #10b981;
+    --green-bg: rgba(16, 185, 129, 0.12);
+    --yellow: #f59e0b;
+    --yellow-bg: rgba(245, 158, 11, 0.12);
+    --red: #ef4444;
+    --red-bg: rgba(239, 68, 68, 0.12);
+    --pre: #64748b;
+    --pre-bg: rgba(100, 116, 139, 0.12);
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  body {
+    padding: 14px 12px 40px;
+  }
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* Minimal Header + Custom Date Picker */
+  .header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .sync-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+  }
+  .dot.loading {
+    background: var(--yellow);
+    box-shadow: 0 0 8px var(--yellow);
+    animation: pulseDot 0.9s infinite ease-in-out;
+  }
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.82); }
+  }
+  .bet-summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #e2e8f0;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .profit-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.1px;
+  }
+  .profit-chip.pos {
+    background: var(--green-bg);
+    color: var(--green);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+  }
+  .profit-chip.neg {
+    background: var(--red-bg);
+    color: var(--red);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+  }
+
+  /* Custom Date Navigator Pill */
+  .date-nav {
+    display: inline-flex;
+    align-items: center;
+    background: #111317;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .date-step {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    border-radius: 7px;
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, opacity 0.15s ease;
+  }
+  .date-step:active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .date-step.disabled {
+    opacity: 0.25;
+    pointer-events: none;
+  }
+  .date-trigger {
+    border: none;
+    background: #1b1f27;
+    color: var(--text);
+    border-radius: 7px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .date-trigger .chev {
+    font-size: 10px;
+    color: var(--muted);
+    transition: transform 0.18s ease;
+  }
+  .date-trigger.open .chev {
+    transform: rotate(180deg);
+  }
+
+  /* Custom Calendar Date Picker Popover */
+  .date-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 288px;
+    background: #13161c;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 14px;
+    padding: 12px 11px 11px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.75);
+    z-index: 50;
+    display: none;
+    backdrop-filter: blur(16px);
+  }
+  .date-dropdown.show {
+    display: block;
+  }
+  .cal-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 9px;
+    padding: 0 2px;
+  }
+  .cal-month-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cal-month {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .cal-day {
+    min-height: 38px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+    font-size: 11.5px;
+    font-weight: 600;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    padding: 3px 1px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .cal-day-num {
+    line-height: 1.1;
+  }
+  .cal-day-pnl {
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: -0.25px;
+    line-height: 1.05;
+  }
+  .cal-day.pnl-pos {
+    background: rgba(16, 185, 129, 0.16);
+    border-color: rgba(16, 185, 129, 0.42);
+    color: #ecfdf5;
+  }
+  .cal-day.pnl-pos .cal-day-pnl {
+    color: #34d399;
+  }
+  .cal-day.pnl-neg {
+    background: rgba(239, 68, 68, 0.16);
+    border-color: rgba(239, 68, 68, 0.42);
+    color: #fef2f2;
+  }
+  .cal-day.pnl-neg .cal-day-pnl {
+    color: #f87171;
+  }
+  .cal-day.pnl-flat .cal-day-pnl {
+    color: var(--muted);
+  }
+  .cal-day:hover:not(.disabled) {
+    filter: brightness(1.15);
+  }
+  .cal-day.disabled {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.16);
+    pointer-events: none;
+    cursor: default;
+  }
+  .cal-day.active {
+    box-shadow: 0 0 0 2px #f8fafc, 0 0 12px rgba(255, 255, 255, 0.28);
+    font-weight: 700;
+  }
+  .cal-day.active.pnl-pos {
+    background: rgba(16, 185, 129, 0.28);
+    border-color: #10b981;
+  }
+  .cal-day.active.pnl-neg {
+    background: rgba(239, 68, 68, 0.28);
+    border-color: #ef4444;
+  }
+
+  /* Skeleton Loading Cards */
+  .skeleton-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 14px 15px;
+    overflow: hidden;
+    position: relative;
+  }
+  .skel-line {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.25s infinite linear;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Segmented Control (Singles vs Parlays — Always 1 Row) */
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    background: #111317;
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    margin-bottom: 10px;
+    position: sticky;
+    top: 10px;
+    z-index: 20;
+    backdrop-filter: blur(12px);
+  }
+  .tab {
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    padding: 8px 0;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .tab-sub {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .tab.active {
+    background: #1e222a;
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+  .tab.active .tab-sub {
+    color: #94a3b8;
+  }
+
+  /* Sub-Filter Pill Strip (Morning/Main Card or Parlay 1/2/3 — Always 1 Row) */
+  .sort-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+  }
+  .sort-pill {
+    flex: 1;
+    background: #111317;
+    color: var(--muted);
+    border: 1px solid var(--card-border);
+    border-radius: 9px;
+    padding: 7px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    text-align: center;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+  }
+  .sort-pill-sub {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .sort-pill.active {
+    background: rgba(16, 185, 129, 0.13);
+    color: var(--text);
+    border-color: rgba(16, 185, 129, 0.45);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  }
+  .sort-pill.active .sort-pill-sub {
+    color: #6ee7b7;
+  }
+
+  /* Paper Trade Tag */
+  .paper-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* Leg Cards */
+  .legs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .leg-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 13px 15px 14px;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .leg-card.status-hit {
+    border-color: rgba(16, 185, 129, 0.45);
+  }
+  .leg-card.status-red {
+    border-color: rgba(239, 68, 68, 0.35);
+  }
+  .leg-card.status-pre {
+    background: #101318;
+    border-color: rgba(255, 255, 255, 0.08);
+    opacity: 0.96;
+  }
+
+  /* Clear Score + Quarter/Period Strip */
+  .game-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .score-box {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.1px;
+  }
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+  }
+  .clock-badge {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.07);
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .player-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .player-name {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.2px;
+    line-height: 1.25;
+  }
+  .team-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .team-tag {
+    font-size: 12px;
+    font-weight: 500;
+    color: #94a3b8;
+  }
+  .pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 99px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .pill-hit, .pill-green {
+    background: var(--green-bg);
+    color: var(--green);
+  }
+  .pill-yellow {
+    background: var(--yellow-bg);
+    color: var(--yellow);
+  }
+  .pill-red {
+    background: var(--red-bg);
+    color: var(--red);
+  }
+  .pill-pre {
+    background: var(--pre-bg);
+    color: #94a3b8;
+  }
+
+  .row-mid {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .prop-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #cbd5e1;
+  }
+  .stat-nums {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* Slider Track + Live Number Circle Knob */
+  .bar-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0 4px;
+  }
+  .bar-track {
+    position: relative;
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fill-hit, .fill-green { background: var(--green); }
+  .fill-yellow { background: var(--yellow); }
+  .fill-red { background: var(--red); }
+  .fill-pre { background: #262b33; }
+
+  .bar-knob {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 26px;
+    height: 26px;
+    padding: 0 7px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+    background: #1c2026;
+    border: 2px solid #475569;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+    transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s, background 0.2s;
+    z-index: 2;
+  }
+  .knob-hit {
+    background: var(--green);
+    border-color: #34d399;
+    color: #052e1f;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.55);
+  }
+  .knob-green {
+    background: #112621;
+    border-color: var(--green);
+    color: #ecfdf5;
+  }
+  .knob-yellow {
+    background: #292011;
+    border-color: var(--yellow);
+    color: #fef3c7;
+  }
+  .knob-red {
+    background: #2a1416;
+    border-color: var(--red);
+    color: #fee2e2;
+  }
+  .knob-pre {
+    background: #14171c;
+    border-color: #262b33;
+    color: #64748b;
+  }
+  .bar-target {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    min-width: 24px;
+    text-align: right;
+  }
+  .bar-target.target-hit {
+    color: var(--green);
+  }
+  .empty-state {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 26px 18px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .empty-state strong {
+    display: block;
+    color: var(--text);
+    font-size: 14.5px;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-left">
+      <div class="sync-status">
+        <div class="dot loading" id="sync-dot"></div>
+        <span id="sync-text">Loading...</span>
+      </div>
+      <div class="bet-summary" id="bet-summary">Loading Card...</div>
+    </div>
+
+    <div class="date-nav">
+      <button class="date-step" id="date-prev" onclick="stepDate(-1)" aria-label="Previous day">‹</button>
+      <button class="date-trigger" id="date-trigger" onclick="toggleDateMenu(event)">
+        <span id="date-label">Sun, Nov 8</span>
+        <span class="chev">▾</span>
+      </button>
+      <button class="date-step" id="date-next" onclick="stepDate(1)" aria-label="Next day">›</button>
+    </div>
+
+    <div class="date-dropdown" id="date-dropdown">
+      <div class="cal-top">
+        <button class="date-step disabled" aria-label="Previous month">‹</button>
+        <div class="cal-month-wrap">
+          <span class="cal-month">Nov 2026</span>
+          <span class="profit-chip pos" id="cal-total-chip">+$17.84</span>
+        </div>
+        <button class="date-step disabled" aria-label="Next month">›</button>
+      </div>
+      <div class="cal-weekdays">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+  </div>
+
+  <!-- Top Row: 2 Main Tabs (Singles | Parlays) -->
+  <div class="tabs">
+    <button class="tab active" id="cat-singles" onclick="selectCategory('singles')">
+      <span>Singles</span>
+      <span class="tab-sub" id="sub-cat-singles">Loading...</span>
+    </button>
+    <button class="tab" id="cat-parlays" onclick="selectCategory('parlays')">
+      <span>Parlays</span>
+      <span class="tab-sub" id="sub-cat-parlays">Loading...</span>
+    </button>
+  </div>
+
+  <!-- Second Row: Filter Pill Strip (Main Card / Morning Card OR Parlay 1 / Parlay 2 / Parlay 3) -->
+  <div class="sort-bar" id="sub-pills"></div>
+
+  <div id="content" class="legs-list"></div>
+</div>
+
+<script>
+let activeCategory = 'singles'; // 'singles' or 'parlays'
+let activeTab = 'P3';           // 'P3' | 'EG' for singles; 'P1' | 'P2' | 'P4' for parlays
+let activeDate = '2026-11-09';
+let dataStore = null;
+const dateCache = {};
+let prefetchedAll = false;
+let fetchSeq = 0;
+
+const DATE_LABELS = {
+  '2026-11-07': 'Sat, Nov 7',
+  '2026-11-08': 'Sun, Nov 8',
+  '2026-11-09': 'Mon, Nov 9',
+};
+const STAKE_MAP = { P3: '8 Main Singles • $156.10 Staked', P1: 'Parlay 1 ($20 -> $72.87 @ 3.64x)', P2: 'Parlay 2 ($20 -> $62.36 @ 3.12x)' };
+const PROFIT_MAP = { P3: '+$116.64', P1: '+$52.87', P2: '+$42.36' };
+
+function renderSkeletons() {
+  const container = document.getElementById('content');
+  if (!container) return;
+  container.innerHTML = [1, 2, 3, 4].map(() => `
+    <div class="skeleton-card">
+      <div class="skel-line" style="width: 45%; margin-bottom: 12px;"></div>
+      <div class="skel-line" style="width: 72%; height: 15px; margin-bottom: 10px;"></div>
+      <div class="skel-line" style="width: 55%; height: 12px; margin-bottom: 14px;"></div>
+      <div class="skel-line" style="width: 100%; height: 8px;"></div>
+    </div>
+  `).join('');
+}
+
+function toggleDateMenu(e) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById('date-dropdown');
+  const tr = document.getElementById('date-trigger');
+  if (!dd || !tr) return;
+  const open = dd.classList.toggle('show');
+  tr.classList.toggle('open', open);
+}
+
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('date-dropdown');
+  const tr = document.getElementById('date-trigger');
+  if (dd && dd.classList.contains('show') && !dd.contains(e.target) && (!tr || !tr.contains(e.target))) {
+    dd.classList.remove('show');
+    if (tr) tr.classList.remove('open');
+  }
+});
+
+function getDefaultSinglesTab(payloadObj) {
+  if (!payloadObj || !payloadObj.parlays) return 'P3';
+  const eg = payloadObj.parlays.find(p => p.id === 'EG');
+  if (eg && Array.isArray(eg.legs) && eg.legs.length > 0) {
+    const hasUnsettled = eg.legs.some(l => l.game_state !== 'post');
+    if (hasUnsettled) return 'EG';
+  }
+  return 'P3';
+}
+
+function selectDate(dt) {
+  if (!dt) return;
+  activeDate = dt;
+  const dd = document.getElementById('date-dropdown');
+  const tr = document.getElementById('date-trigger');
+  if (dd) dd.classList.remove('show');
+  if (tr) tr.classList.remove('open');
+  const lblEl = document.getElementById('date-label');
+  if (lblEl && DATE_LABELS[dt]) lblEl.innerText = DATE_LABELS[dt];
+  // Instant 0ms switch if already cached in memory!
+  if (dateCache[dt]) {
+    dataStore = dateCache[dt];
+    if (activeCategory === 'singles') {
+      activeTab = getDefaultSinglesTab(dataStore);
+    }
+    const st = document.getElementById('sync-text');
+    if (st) st.innerText = dataStore.settled_permanent ? 'Settled Final' : ('Updated ' + dataStore.updated_at);
+    render();
+    if (!dataStore.settled_permanent) {
+      fetchLive(false);
+    }
+    return;
+  }
+  const bs = document.getElementById('bet-summary');
+  if (bs) bs.innerText = 'Loading ' + (DATE_LABELS[dt] || dt) + ' Card...';
+  renderSkeletons();
+  fetchLive(true);
+}
+
+function stepDate(dir) {
+  const avail = (dataStore && dataStore.available_dates)
+    ? dataStore.available_dates.map(d => d.date)
+    : Object.keys(DATE_LABELS);
+  const idx = avail.indexOf(activeDate);
+  const nextIdx = idx + dir;
+  if (nextIdx >= 0 && nextIdx < avail.length) {
+    selectDate(avail[nextIdx]);
+  }
+}
+
+function selectCategory(cat) {
+  activeCategory = cat;
+  document.getElementById('cat-singles')?.classList.toggle('active', cat === 'singles');
+  document.getElementById('cat-parlays')?.classList.toggle('active', cat === 'parlays');
+  if (cat === 'singles') {
+    if (activeTab !== 'P3' && activeTab !== 'EG') {
+      activeTab = getDefaultSinglesTab(dataStore);
+    }
+  } else {
+    if (activeTab !== 'P1' && activeTab !== 'P2' && activeTab !== 'P4') activeTab = 'P1';
+  }
+  render();
+}
+
+function selectSubTab(id) {
+  activeTab = id;
+  render();
+}
+
+function sortLegsByRisk(legs) {
+  return [...legs].sort((a, b) => {
+    if ((a.risk_tier ?? 4) !== (b.risk_tier ?? 4)) {
+      return (a.risk_tier ?? 4) - (b.risk_tier ?? 4);
+    }
+    if (a.game_state === 'in' && b.game_state === 'in') {
+      if ((a.pace_delta ?? 0) !== (b.pace_delta ?? 0)) {
+        return (a.pace_delta ?? 0) - (b.pace_delta ?? 0);
+      }
+      return (a.pct ?? 0) - (b.pct ?? 0);
+    }
+    return (a.start_order ?? 2000) - (b.start_order ?? 2000);
+  });
+}
+
+function render() {
+  if (!dataStore) return;
+
+  if (dataStore.available_dates) {
+    const dates = dataStore.available_dates;
+    const idx = dates.findIndex(d => d.date === activeDate);
+    const curObj = idx >= 0 ? dates[idx] : dates[dates.length - 1];
+    const lblEl = document.getElementById('date-label');
+    if (lblEl && curObj) lblEl.innerText = curObj.short_label;
+    const prevBtn = document.getElementById('date-prev');
+    const nextBtn = document.getElementById('date-next');
+    if (prevBtn) prevBtn.classList.toggle('disabled', idx <= 0);
+    if (nextBtn) nextBtn.classList.toggle('disabled', idx < 0 || idx >= dates.length - 1);
+
+    const gridEl = document.getElementById('cal-grid');
+    if (gridEl) {
+      const availMap = {};
+      const lockedMap = {};
+      let runningTotal = 0;
+      dates.forEach(d => {
+        const cachedNet = (dateCache[d.date] && dateCache[d.date].day_net !== undefined)
+          ? Number(dateCache[d.date].day_net)
+          : Number(d.net ?? 0);
+        availMap[d.date] = cachedNet;
+        lockedMap[d.date] = Boolean(d.locked);
+        runningTotal += cachedNet;
+      });
+      const totChip = document.getElementById('cal-total-chip');
+      if (totChip) {
+        const tSign = runningTotal >= 0 ? '+' : '-';
+        totChip.className = 'profit-chip ' + (runningTotal >= 0 ? 'pos' : 'neg');
+        totChip.innerText = `${tSign}$${Math.abs(runningTotal).toFixed(2)} Total`;
+      }
+      let cells = '';
+      for (let day = 1; day <= 30; day++) {
+        const dtStr = '2026-11-' + String(day).padStart(2, '0');
+        const isAvail = Object.prototype.hasOwnProperty.call(availMap, dtStr);
+        const isActive = dtStr === activeDate;
+        if (!isAvail) {
+          cells += `<button class="cal-day disabled"><span class="cal-day-num">${day}</span></button>`;
+        } else {
+          const dNet = Number(availMap[dtStr] || 0);
+          const isLocked = lockedMap[dtStr];
+          let pnlCls = 'pnl-flat';
+          let pnlTxt = isLocked ? '$0' : '—';
+          if (dNet > 0.005) {
+            pnlCls = 'pnl-pos';
+            pnlTxt = '+$' + Math.round(dNet);
+          } else if (dNet < -0.005) {
+            pnlCls = 'pnl-neg';
+            pnlTxt = '-$' + Math.round(Math.abs(dNet));
+          }
+          const cls = `cal-day ${pnlCls}${isActive ? ' active' : ''}`;
+          cells += `<button class="${cls}" onclick="selectDate('${dtStr}')"><span class="cal-day-num">${day}</span><span class="cal-day-pnl">${pnlTxt}</span></button>`;
+        }
+      }
+      gridEl.innerHTML = cells;
+    }
+  }
+
+  const pMap = {};
+  (dataStore.parlays || []).forEach(p => { pMap[p.id] = p; });
+
+  // Update Top-Level Category Subtitles
+  const p3Obj = pMap['P3'] || { legs: [], profit_str: '+$0.00' };
+  const egObj = pMap['EG'];
+  const sLegsTotal = (p3Obj.legs?.length || 0) + (egObj?.legs?.length || 0);
+  const sHitsTotal = (p3Obj.legs || []).filter(l => l.status === 'hit').length + (egObj ? egObj.legs.filter(l => l.status === 'hit').length : 0);
+  const subSinglesEl = document.getElementById('sub-cat-singles');
+  if (subSinglesEl) {
+    const p3Prof = p3Obj.profit_str || PROFIT_MAP['P3'] || '+$0.00';
+    subSinglesEl.innerText = `${p3Prof} • ${sHitsTotal}/${sLegsTotal} Hits`;
+  }
+
+  const parlayIds = ['P1', 'P2', 'P4'].filter(id => pMap[id] && (pMap[id].legs || []).length > 0);
+  const subParlaysEl = document.getElementById('sub-cat-parlays');
+  if (subParlaysEl) {
+    if (parlayIds.length > 0) {
+      let totalParlayHits = 0;
+      let totalParlayLegs = 0;
+      parlayIds.forEach(id => {
+        const legs = pMap[id].legs || [];
+        totalParlayLegs += legs.length;
+        totalParlayHits += legs.filter(l => l.status === 'hit').length;
+      });
+      subParlaysEl.innerText = `${parlayIds.length} Parlays • ${totalParlayHits}/${totalParlayLegs} Legs`;
+    } else {
+      subParlaysEl.innerText = '0 Active Parlays';
+    }
+  }
+
+  // Ensure activeTab is valid for activeCategory
+  if (activeCategory === 'singles') {
+    if (activeTab === 'EG' && !egObj) activeTab = 'P3';
+    if (activeTab !== 'P3' && activeTab !== 'EG') activeTab = 'P3';
+  } else {
+    if (!parlayIds.includes(activeTab)) {
+      activeTab = parlayIds[0] || 'P1';
+    }
+  }
+
+  // Render Second-Row Sub-Filter Pills
+  const pillsEl = document.getElementById('sub-pills');
+  if (pillsEl) {
+    if (sLegsTotal === 0 && parlayIds.length === 0) {
+      pillsEl.innerHTML = '';
+    } else if (activeCategory === 'singles') {
+      const mainHits = (p3Obj.legs || []).filter(l => l.status === 'hit').length;
+      const mainProf = p3Obj.profit_str || PROFIT_MAP['P3'] || '+$0.00';
+      let pillsHtml = '';
+      if (egObj && (egObj.legs || []).length > 0) {
+        const egHits = egObj.legs.filter(l => l.status === 'hit').length;
+        pillsHtml += `
+          <button class="sort-pill ${activeTab === 'EG' ? 'active' : ''}" onclick="selectSubTab('EG')">
+            <span>Morning Card (${egObj.legs.length})</span>
+            <span class="sort-pill-sub">${egObj.profit_str || ''} • ${egHits}/${egObj.legs.length}</span>
+          </button>
+        `;
+      }
+      pillsHtml += `
+        <button class="sort-pill ${activeTab === 'P3' ? 'active' : ''}" onclick="selectSubTab('P3')">
+          <span>Main Card (${(p3Obj.legs || []).length})</span>
+          <span class="sort-pill-sub">${mainProf} • ${mainHits}/${(p3Obj.legs || []).length}</span>
+        </button>
+      `;
+      pillsEl.innerHTML = pillsHtml;
+    } else {
+      if (parlayIds.length === 0) {
+        pillsEl.innerHTML = '';
+      } else {
+        pillsEl.innerHTML = parlayIds.map((pid, idx) => {
+          const p = pMap[pid];
+          const hits = (p.legs || []).filter(l => l.status === 'hit').length;
+          const prof = p.profit_str || PROFIT_MAP[pid] || '';
+          return `
+            <button class="sort-pill ${activeTab === pid ? 'active' : ''}" onclick="selectSubTab('${pid}')">
+              <span>Parlay ${idx + 1}</span>
+              <span class="sort-pill-sub">${prof} • ${hits}/${(p.legs || []).length}</span>
+            </button>
+          `;
+        }).join('');
+      }
+    }
+  }
+
+  const container = document.getElementById('content');
+  const parlay = pMap[activeTab] || p3Obj;
+  const bs = document.getElementById('bet-summary');
+  if (bs) {
+    if (sLegsTotal === 0 && parlayIds.length === 0) {
+      bs.innerHTML = `<span>No Picks Locked Yet</span>`;
+    } else {
+      const dayRisk = Number(dataStore.day_risk ?? parlay?.risk_val ?? 0);
+      const dayNet = Number(dataStore.day_net ?? parlay?.net_val ?? 0);
+      const chipCls = dayNet >= 0 ? 'pos' : 'neg';
+      const netSign = dayNet >= 0 ? '+' : '-';
+      const netFmt = `${netSign}$${Math.abs(dayNet).toFixed(2)} Net`;
+      const riskFmt = dayRisk % 1 === 0 ? `$${dayRisk.toFixed(0)} Risk` : `$${dayRisk.toFixed(2)} Risk`;
+      bs.innerHTML = `<span>${riskFmt}</span><span class="profit-chip ${chipCls}">${netFmt}</span>`;
+    }
+  }
+
+  const rawLegs = (parlay && parlay.legs) ? parlay.legs : [];
+  if (rawLegs.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <strong>No Picks Locked Yet for ${DATE_LABELS[activeDate] || activeDate}</strong>
+        We wait for the full morning sportsbook board (~10:30 AM EST) and complete our forensic analysis before locking any plays.
+      </div>
+    `;
+    return;
+  }
+
+  const sortedLegs = sortLegsByRisk(rawLegs);
+
+  container.innerHTML = sortedLegs.map(l => {
+    const isLive = l.game_state === 'in';
+    const pctNum = l.status === 'pre' ? 0 : Math.min(100, Math.max(0, l.pct));
+    const knobPos = Math.min(96, Math.max(4, pctNum));
+    const rightInfo = l.sub_stat
+      ? l.sub_stat
+      : (l.game_state === 'pre' ? '' : (l.remaining > 0 ? `${l.remaining} to go` : 'Target Hit'));
+    const paperTag = (l.paper_trade || activeDate >= '2026-11-08')
+      ? '<span class="paper-badge">PAPER TRADE</span>'
+      : '';
+
+    return `
+      <div class="leg-card status-${l.status}">
+        <div class="game-strip">
+          <div class="score-box">
+            ${isLive ? '<span class="live-dot"></span>' : ''}
+            <span>${l.game_score}</span>
+          </div>
+          <span class="clock-badge">${l.game_clock}</span>
+        </div>
+        <div class="row-top">
+          <div class="player-block">
+            <span class="player-name">${l.player}</span>
+            <div class="team-line">
+              <span class="team-tag">${l.team}</span>
+              ${paperTag}
+            </div>
+          </div>
+          <span class="pill pill-${l.status}">${l.badge}</span>
+        </div>
+        <div class="row-mid">
+          <span class="prop-name">${l.prop_label}</span>
+          <span class="stat-nums">${rightInfo}</span>
+        </div>
+        <div class="bar-container">
+          <div class="bar-track">
+            <div class="bar-fill fill-${l.status}" style="width: ${pctNum}%"></div>
+            <div class="bar-knob knob-${l.status}" style="left: ${knobPos}%">${l.current}</div>
+          </div>
+          <div class="bar-target ${l.status === 'hit' ? 'target-hit' : ''}">${l.target}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+const ESPN_SPORT_PATH = {
+  NBA: 'basketball/nba',
+  NHL: 'hockey/nhl',
+  NFL: 'football/nfl',
+  NCAAB: 'basketball/mens-college-basketball',
+};
+
+const TEAM_ALIAS = {
+  WAS: 'WSH', WSH: 'WSH',
+  GSW: 'GS', GS: 'GS',
+  NOP: 'NO', NO: 'NO',
+  NYK: 'NY', NY: 'NY',
+  SAS: 'SA', SA: 'SA',
+  UTA: 'UTAH', UTAH: 'UTAH',
+  TBL: 'TB', TB: 'TB',
+  NJD: 'NJ', NJ: 'NJ',
+  LAK: 'LA', LA: 'LA',
+  SJS: 'SJ', SJ: 'SJ',
+};
+
+function normTeam(sp, abbr) {
+  const u = String(abbr || '').toUpperCase().trim();
+  if (sp === 'NHL' && u === 'VGK') return 'VGK';
+  return TEAM_ALIAS[u] || u;
+}
+
+function normPlayerName(s) {
+  return String(s || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, '')
+    .replace(/(jr|sr|ii|iii|iv)/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+async function updateLiveFromESPNInBrowser(payloadObj) {
+  if (!payloadObj || payloadObj.settled_permanent || !Array.isArray(payloadObj.parlays)) {
+    return payloadObj;
+  }
+  const dt = payloadObj.current_date || activeDate;
+  const ymd = dt.replace(/-/g, '');
+  const allLegs = [];
+  payloadObj.parlays.forEach(p => (p.legs || []).forEach(l => allLegs.push(l)));
+  if (allLegs.length === 0) return payloadObj;
+
+  const sportsNeeded = [...new Set(allLegs.map(l => l.raw_sport).filter(sp => ESPN_SPORT_PATH[sp]))];
+  const gameMap = {};   // key: `${sp}_${tm}` -> { state, clock, scoreStr, ts, os, eventId }
+  const playerMap = {}; // key: `${sp}_${tm}_${normName}` -> { PTS, REB, AST, 3PM, PR, PA, RA, PRA, SOG, GOALS, REC, RECYDS, RUSHYDS, PASSYDS, RUSHREC }
+
+  for (const sp of sportsNeeded) {
+    try {
+      const sbUrl = `https://site.api.espn.com/apis/site/v2/sports/${ESPN_SPORT_PATH[sp]}/scoreboard?dates=${ymd}&t=${Date.now()}`;
+      const sbRes = await fetch(sbUrl);
+      if (!sbRes.ok) continue;
+      const sbJson = await sbRes.json();
+      const events = sbJson.events || [];
+      const activeEvents = [];
+
+      for (const ev of events) {
+        const comp = (ev.competitions || [])[0];
+        if (!comp) continue;
+        const stType = comp.status?.type || {};
+        const state = stType.state || 'pre'; // 'pre' | 'in' | 'post'
+        const shortDetail = stType.shortDetail || 'Scheduled';
+        const competitors = comp.competitors || [];
+        if (competitors.length < 2) continue;
+        const home = competitors.find(c => c.homeAway === 'home') || competitors[0];
+        const away = competitors.find(c => c.homeAway === 'away') || competitors[1];
+        const hAbbr = normTeam(sp, home.team?.abbreviation);
+        const aAbbr = normTeam(sp, away.team?.abbreviation);
+        const hName = home.team?.displayName || hAbbr;
+        const aName = away.team?.displayName || aAbbr;
+        const hScore = Number(home.score || 0);
+        const aScore = Number(away.score || 0);
+        const scoreStr = state === 'pre'
+          ? `${aName} @ ${hName}`
+          : `${aName} ${aScore} - ${hScore} ${hName}`;
+        const clockLbl = state === 'post' ? 'Final' : (state === 'pre' ? `Starts ${shortDetail.split(' - ').pop()}` : shortDetail);
+
+        gameMap[`${sp}_${hAbbr}`] = { state, clock: clockLbl, scoreStr, ts: hScore, os: aScore, eventId: ev.id };
+        gameMap[`${sp}_${aAbbr}`] = { state, clock: clockLbl, scoreStr, ts: aScore, os: hScore, eventId: ev.id };
+
+        if (state === 'in' || state === 'post') {
+          const neededTeams = new Set(allLegs.filter(l => l.raw_sport === sp).map(l => normTeam(sp, l.raw_team)));
+          if (neededTeams.has(hAbbr) || neededTeams.has(aAbbr)) {
+            activeEvents.push({ id: ev.id, hAbbr, aAbbr });
+          }
+        }
+      }
+
+      for (const evInfo of activeEvents) {
+        try {
+          const sumUrl = `https://site.api.espn.com/apis/site/v2/sports/${ESPN_SPORT_PATH[sp]}/summary?event=${evInfo.id}&t=${Date.now()}`;
+          const sumRes = await fetch(sumUrl);
+          if (!sumRes.ok) continue;
+          const sumJson = await sumRes.json();
+          const pGroups = sumJson.boxscore?.players || [];
+          for (const pg of pGroups) {
+            const tAbbr = normTeam(sp, pg.team?.abbreviation);
+            for (const stGrp of (pg.statistics || [])) {
+              const labels = (stGrp.labels || []).map(x => String(x).toUpperCase());
+              const catName = String(stGrp.name || '').toLowerCase();
+              for (const ath of (stGrp.athletes || [])) {
+                const disp = ath.athlete?.displayName || '';
+                const jersey = String(ath.athlete?.jersey || '');
+                // Disambiguate VAN Elias Pettersson (#40 C vs #25 D Elias N. Pettersson)
+                if (sp === 'NHL' && tAbbr === 'VAN' && disp.includes('Pettersson') && jersey === '25') {
+                  continue;
+                }
+                const pKey = `${sp}_${tAbbr}_${normPlayerName(disp)}`;
+                if (!playerMap[pKey]) playerMap[pKey] = {};
+                const stats = ath.stats || [];
+                const getVal = (lbl) => {
+                  const idx = labels.indexOf(lbl);
+                  if (idx < 0 || idx >= stats.length) return 0;
+                  const raw = String(stats[idx]);
+                  if (raw.includes('-')) return Number(raw.split('-')[0]) || 0;
+                  return Number(raw) || 0;
+                };
+                if (sp === 'NBA' || sp === 'NCAAB') {
+                  const pts = getVal('PTS');
+                  const reb = getVal('REB');
+                  const ast = getVal('AST');
+                  const tpm = getVal('3PT');
+                  playerMap[pKey].PTS = pts;
+                  playerMap[pKey].REB = reb;
+                  playerMap[pKey].AST = ast;
+                  playerMap[pKey]['3PM'] = tpm;
+                  playerMap[pKey].PR = pts + reb;
+                  playerMap[pKey].PA = pts + ast;
+                  playerMap[pKey].RA = reb + ast;
+                  playerMap[pKey].PRA = pts + reb + ast;
+                } else if (sp === 'NHL') {
+                  if (catName === 'goalies') continue;
+                  const g = getVal('G');
+                  const a = getVal('A');
+                  const sog = getVal('S'); // 'S' is Shots on Goal in ESPN NHL boxscores
+                  playerMap[pKey].GOALS = g;
+                  playerMap[pKey].AST = a;
+                  playerMap[pKey].PTS = g + a;
+                  playerMap[pKey].SOG = sog;
+                } else if (sp === 'NFL') {
+                  if (catName === 'passing') {
+                    playerMap[pKey].PASSYDS = getVal('YDS');
+                  } else if (catName === 'rushing') {
+                    playerMap[pKey].RUSHYDS = getVal('YDS');
+                  } else if (catName === 'receiving') {
+                    playerMap[pKey].REC = getVal('REC');
+                    playerMap[pKey].RECYDS = getVal('YDS');
+                  }
+                  playerMap[pKey].RUSHREC = (playerMap[pKey].RUSHYDS || 0) + (playerMap[pKey].RECYDS || 0);
+                  playerMap[pKey].PASSRUSH = (playerMap[pKey].PASSYDS || 0) + (playerMap[pKey].RUSHYDS || 0);
+                }
+              }
+            }
+          }
+        } catch (e) {}
+      }
+    } catch (e) {}
+  }
+
+  // Update each leg & recalculate parlay/day P&L
+  let dayNetTotal = 0;
+  let dayRiskTotal = 0;
+
+  for (const p of payloadObj.parlays) {
+    for (const l of (p.legs || [])) {
+      const sp = l.raw_sport;
+      const tm = normTeam(sp, l.raw_team);
+      const gInfo = gameMap[`${sp}_${tm}`];
+      if (!gInfo) continue;
+
+      l.game_state = gInfo.state;
+      l.game_clock = gInfo.clock;
+      l.game_score = gInfo.scoreStr;
+
+      if (l.raw_player && l.raw_stat) {
+        const pKey = `${sp}_${tm}_${normPlayerName(l.raw_player)}`;
+        const pStats = playerMap[pKey];
+        const curVal = pStats && pStats[l.raw_stat] !== undefined ? Number(pStats[l.raw_stat]) : 0;
+        const ln = Number(l.raw_line);
+        const side = l.raw_side; // 'O' or 'U'
+        const sideWord = side === 'O' ? 'Over' : 'Under';
+
+        if (gInfo.state !== 'pre') {
+          l.current = curVal;
+          l.sub_stat = `${curVal} ${l.raw_stat} (${sideWord} ${ln})`;
+        }
+
+        if (gInfo.state === 'pre') {
+          l.status = 'pre';
+          l.badge = 'Upcoming';
+          l.risk_tier = 4;
+          l.pct = 0;
+        } else if (side === 'O') {
+          const tgt = Math.floor(ln) + 1;
+          l.target = tgt;
+          l.remaining = Math.max(0, tgt - curVal);
+          l.pct = Math.min(100, Math.round((curVal / Math.max(1, tgt)) * 1000) / 10);
+          if (curVal > ln) {
+            l.status = 'hit';
+            l.badge = 'Hit';
+            l.risk_tier = 6;
+          } else if (gInfo.state === 'post') {
+            l.status = 'red';
+            l.badge = 'Missed';
+            l.risk_tier = 5;
+          } else {
+            l.status = 'green';
+            l.badge = 'In Play';
+            l.risk_tier = 2;
+          }
+        } else if (side === 'U') {
+          l.target = ln;
+          l.remaining = Math.max(0, Math.round((ln - curVal) * 10) / 10);
+          if (curVal > ln) {
+            l.status = 'red';
+            l.badge = gInfo.state === 'in' ? 'Over (Lost)' : 'Missed';
+            l.pct = 0;
+            l.risk_tier = gInfo.state === 'in' ? 0 : 5;
+          } else if (gInfo.state === 'post') {
+            l.status = 'hit';
+            l.badge = 'Hit';
+            l.pct = 100;
+            l.risk_tier = 6;
+          } else {
+            l.pct = Math.min(100, Math.round((curVal / Math.max(0.5, ln)) * 1000) / 10);
+            if (curVal === Math.floor(ln)) {
+              l.status = 'yellow';
+              l.badge = `At Limit (${curVal})`;
+              l.risk_tier = 1;
+            } else {
+              l.status = 'green';
+              l.badge = 'Under Pace';
+              l.risk_tier = 2;
+            }
+          }
+        }
+      }
+    }
+
+    // Recompute parlay/singles group net_val & profit_str
+    const legs = p.legs || [];
+    if (p.id === 'P3' || p.id === 'EG') {
+      let sNet = 0;
+      let sw = 0;
+      let sl = 0;
+      for (const l of legs) {
+        const odds = Number(l.raw_odds || 1.9);
+        if (l.status === 'hit') {
+          sNet += (odds - 1.0) * 20.0;
+          sw++;
+        } else if (l.status === 'red' && (l.game_state === 'post' || l.raw_side === 'U')) {
+          sNet -= 20.0;
+          sl++;
+        }
+      }
+      p.net_val = Math.round(sNet * 100) / 100;
+      const sign = p.net_val >= 0 ? '+' : '-';
+      p.profit_str = `${sign}$${Math.abs(p.net_val).toFixed(2)}`;
+      p.name = `$${(legs.length * 20).toFixed(0)} Risk • ${sw}-${sl} Settled`;
+    } else if (legs.length >= 2) {
+      const oComb = Math.round(legs.reduce((acc, l) => acc * Number(l.raw_odds || 1.9), 1.0) * 100) / 100;
+      const netP = 20.0 * (oComb - 1.0);
+      if (legs.every(l => l.status === 'hit')) {
+        p.net_val = Math.round(netP * 100) / 100;
+        p.profit_str = `+$${netP.toFixed(2)}`;
+      } else if (legs.some(l => l.status === 'red' && (l.game_state === 'post' || l.raw_side === 'U'))) {
+        p.net_val = -20.0;
+        p.profit_str = '-$20.00';
+      } else {
+        p.net_val = 0.0;
+        p.profit_str = `+$0.00 (To Win +$${netP.toFixed(2)})`;
+      }
+    }
+    dayRiskTotal += Number(p.risk_val || 0);
+    dayNetTotal += Number(p.net_val || 0);
+  }
+
+  payloadObj.day_risk = Math.round(dayRiskTotal * 100) / 100;
+  payloadObj.day_net = Math.round(dayNetTotal * 100) / 100;
+  payloadObj.updated_at = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+  if (Array.isArray(payloadObj.available_dates)) {
+    const dObj = payloadObj.available_dates.find(d => d.date === dt);
+    if (dObj) dObj.net = payloadObj.day_net;
+  }
+  return payloadObj;
+}
+
+async function fetchDateJson(dt) {
+  let json = null;
+  let usedStaticFallback = false;
+  try {
+    const res = await fetch('/api/live?date=' + encodeURIComponent(dt) + '&t=' + Date.now());
+    if (res.ok) {
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('json')) {
+        json = await res.json();
+      }
+    }
+  } catch (e) {}
+
+  if (!json) {
+    usedStaticFallback = true;
+    const res2 = await fetch('api/live-' + encodeURIComponent(dt) + '.json?t=' + Date.now());
+    json = await res2.json();
+  }
+
+  if (json && !json.settled_permanent && usedStaticFallback) {
+    await updateLiveFromESPNInBrowser(json);
+  }
+  return json;
+}
+
+async function prefetchAllDates() {
+  if (prefetchedAll) return;
+  prefetchedAll = true;
+  const dates = Object.keys(DATE_LABELS);
+  for (const dt of dates) {
+    if (dateCache[dt]) continue;
+    try {
+      const json = await fetchDateJson(dt);
+      if (json && json.parlays) {
+        dateCache[dt] = json;
+      }
+    } catch (e) {}
+  }
+}
+
+async function fetchLive(isManual) {
+  const reqDt = activeDate;
+  if (!isManual && dateCache[reqDt] && dateCache[reqDt].settled_permanent) {
+    return; // Settled (>2h post-game) dates never need re-polling
+  }
+  const mySeq = ++fetchSeq;
+  const dot = document.getElementById('sync-dot');
+  const st = document.getElementById('sync-text');
+  if (dot && !dateCache[reqDt]) dot.classList.add('loading');
+  if (st && !dateCache[reqDt] && (isManual || !dataStore)) st.innerText = 'Loading...';
+  try {
+    const json = await fetchDateJson(reqDt);
+    if (json && json.parlays) {
+      dateCache[reqDt] = json;
+    }
+    if (mySeq !== fetchSeq || activeDate !== reqDt) return;
+    dataStore = json;
+    if (isManual && activeCategory === 'singles') {
+      activeTab = getDefaultSinglesTab(dataStore);
+    }
+    if (st) st.innerText = dataStore.settled_permanent ? 'Settled Final' : ('Updated ' + dataStore.updated_at);
+    render();
+    prefetchAllDates();
+  } catch (e) {
+    if (mySeq === fetchSeq && st && !dateCache[reqDt]) st.innerText = 'Reconnecting...';
+  } finally {
+    if (mySeq === fetchSeq && dot) dot.classList.remove('loading');
+  }
+}
+
+renderSkeletons();
+setInterval(() => fetchLive(false), 20000);
+fetchLive(true);
+</script>
+</body>
+</html>

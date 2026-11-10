@@ -680,7 +680,7 @@
     <div class="date-nav">
       <button class="date-step" id="date-prev" onclick="stepDate(-1)" aria-label="Previous day">‹</button>
       <button class="date-trigger" id="date-trigger" onclick="toggleDateMenu(event)">
-        <span id="date-label">Sun, Nov 8</span>
+        <span id="date-label">Tue, Nov 10</span>
         <span class="chev">▾</span>
       </button>
       <button class="date-step" id="date-next" onclick="stepDate(1)" aria-label="Next day">›</button>
@@ -691,7 +691,7 @@
         <button class="date-step disabled" aria-label="Previous month">‹</button>
         <div class="cal-month-wrap">
           <span class="cal-month">Nov 2026</span>
-          <span class="profit-chip pos" id="cal-total-chip">+$17.84</span>
+          <span class="profit-chip pos" id="cal-total-chip">+$100.44</span>
         </div>
         <button class="date-step disabled" aria-label="Next month">›</button>
       </div>
@@ -723,7 +723,7 @@
 <script>
 let activeCategory = 'singles'; // 'singles' or 'parlays'
 let activeTab = 'P3';           // 'P3' | 'EG' for singles; 'P1' | 'P2' | 'P4' for parlays
-let activeDate = '2026-11-09';
+let activeDate = '2026-11-10';
 let dataStore = null;
 const dateCache = {};
 let prefetchedAll = false;
@@ -733,6 +733,7 @@ const DATE_LABELS = {
   '2026-11-07': 'Sat, Nov 7',
   '2026-11-08': 'Sun, Nov 8',
   '2026-11-09': 'Mon, Nov 9',
+  '2026-11-10': 'Tue, Nov 10',
 };
 const STAKE_MAP = { P3: '8 Main Singles • $156.10 Staked', P1: 'Parlay 1 ($20 -> $72.87 @ 3.64x)', P2: 'Parlay 2 ($20 -> $62.36 @ 3.12x)' };
 const PROFIT_MAP = { P3: '+$116.64', P1: '+$52.87', P2: '+$42.36' };

@@ -1157,9 +1157,11 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
               const stType = comp.status?.type || {};
               const state = stType.state || 'pre';
               const shortDetail = stType.shortDetail || 'Scheduled';
-              const names = cs.map(c => c.athlete?.displayName || '');
+              const detFull = String(stType.detail || '').toLowerCase();
               const ls0 = (cs[0].linescores || []).map(x => Number(x.value || 0));
               const ls1 = (cs[1].linescores || []).map(x => Number(x.value || 0));
+              const isWalkover = detFull.includes('walkover') || shortDetail.toLowerCase().includes('walkover') || (state === 'post' && ls0.length === 0 && ls1.length === 0);
+              const names = cs.map(c => c.athlete?.displayName || '');
               const nSets = Math.min(ls0.length, ls1.length);
               let sets0 = 0, sets1 = 0;
               for (let si = 0; si < nSets; si++) {
@@ -1170,7 +1172,7 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
                   else if (g1 > g0) sets1++;
                 }
               }
-              if (state === 'post') {
+              if (state === 'post' && !isWalkover) {
                 if (cs[0].winner && sets0 <= sets1) sets0 = Math.max(sets0, sets1 + 1, 2);
                 else if (cs[1].winner && sets1 <= sets0) sets1 = Math.max(sets1, sets0 + 1, 2);
               }
@@ -1180,12 +1182,14 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
                 const oppName = names[1 - idx];
                 const surname = (meName.trim().split(/\s+/).pop() || '').toUpperCase();
                 const setStr = meL.slice(0, Math.min(meL.length, oppL.length)).map((v, i) => `${v}-${oppL[i]}`).join(', ');
-                const scoreStr = state === 'pre'
-                  ? `${meName} vs ${oppName}`
-                  : (state === 'post' ? `${meName} ${meS} - ${oppS} ${oppName}${setStr ? ' (' + setStr + ')' : ''}` : `${meName} ${meS}-${oppS} Sets${setStr ? ' (' + setStr + ')' : ''} vs ${oppName}`);
-                const clockLbl = state === 'post' ? 'Final' : (state === 'pre' ? `Starts ${shortDetail}` : shortDetail);
+                const scoreStr = isWalkover
+                  ? `${meName} vs ${oppName} (Walkover)`
+                  : (state === 'pre'
+                    ? `${meName} vs ${oppName}`
+                    : (state === 'post' ? `${meName} ${meS} - ${oppS} ${oppName}${setStr ? ' (' + setStr + ')' : ''}` : `${meName} ${meS}-${oppS} Sets${setStr ? ' (' + setStr + ')' : ''} vs ${oppName}`));
+                const clockLbl = isWalkover ? 'Walkover • Void' : (state === 'post' ? 'Final' : (state === 'pre' ? `Starts ${shortDetail}` : shortDetail));
                 const gDiff = (meL.length && oppL.length) ? (meL[meL.length - 1] - oppL[oppL.length - 1]) : 0;
-                gameMap[`${sp}_${surname}`] = { state, clock: clockLbl, scoreStr, ts: meS, os: oppS, setStr, gDiff, isTennis: true, elapsed: state === 'post' ? 1.0 : 0.5 };
+                gameMap[`${sp}_${surname}`] = { state, clock: clockLbl, scoreStr, ts: meS, os: oppS, setStr, gDiff, isTennis: true, isWalkover, elapsed: state === 'post' ? 1.0 : 0.5 };
               }
             }
           }
@@ -1333,9 +1337,19 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
         const ts = Number(gInfo.ts || 0);
         const os = Number(gInfo.os || 0);
         const isTen = Boolean(gInfo.isTennis);
+        const isWo = Boolean(gInfo.isWalkover);
         const setStr = gInfo.setStr || '';
         const gDiff = Number(gInfo.gDiff || 0);
-        if (gInfo.state === 'pre') {
+        if (isWo) {
+          l.current = 0;
+          l.target = 2;
+          l.remaining = 0;
+          l.pct = 100;
+          l.status = 'pre';
+          l.badge = 'Void ($15 Refund)';
+          l.risk_tier = 6;
+          l.sub_stat = 'Walkover • Ticket Refunded ($0.00 Net)';
+        } else if (gInfo.state === 'pre') {
           l.current = 0;
           l.target = isTen ? 2 : 1;
           l.remaining = isTen ? 2 : 1;

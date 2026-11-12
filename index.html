@@ -726,7 +726,7 @@
 <script>
 let activeCategory = 'singles'; // 'singles' or 'parlays'
 let activeTab = 'P3';           // 'P3' | 'EG' for singles; 'P1' | 'P2' | 'P4' for parlays
-let activeDate = '2026-11-11';
+let activeDate = '2026-11-12';
 let dataStore = null;
 const dateCache = {};
 let prefetchedAll = false;
@@ -735,6 +735,7 @@ let fetchSeq = 0;
 const DATE_LABELS = {
   '2026-11-07': 'Sat, Nov 7',
   '2026-11-11': 'Wed, Nov 11',
+  '2026-11-12': 'Thu, Nov 12',
 };
 const STAKE_MAP = { P3: '8 Main Singles • $156.10 Staked', P1: 'Parlay 1 ($20 -> $72.87 @ 3.64x)', P2: 'Parlay 2 ($20 -> $62.36 @ 3.12x)' };
 const PROFIT_MAP = { P3: '+$116.64', P1: '+$52.87', P2: '+$42.36' };
@@ -957,8 +958,9 @@ function render() {
 
   // Ensure activeTab is valid for activeCategory
   if (activeCategory === 'singles') {
-    if (activeTab === 'EG' && !egObj) activeTab = 'P3';
-    if (activeTab !== 'P3' && activeTab !== 'EG') activeTab = 'P3';
+    if (activeTab === 'EG' && (!egObj || !(egObj.legs || []).length)) activeTab = 'P3';
+    else if (activeTab === 'P3' && !(p3Obj.legs || []).length && egObj && (egObj.legs || []).length) activeTab = 'EG';
+    if (activeTab !== 'P3' && activeTab !== 'EG') activeTab = (p3Obj.legs || []).length ? 'P3' : 'EG';
   } else {
     if (!parlayIds.includes(activeTab)) {
       activeTab = parlayIds[0] || 'P1';
@@ -1086,6 +1088,8 @@ const ESPN_SPORT_PATH = {
   NHL: 'hockey/nhl',
   NFL: 'football/nfl',
   NCAAB: 'basketball/mens-college-basketball',
+  ATP: 'tennis/atp',
+  WTA: 'tennis/wta',
 };
 
 const TEAM_ALIAS = {
@@ -1139,6 +1143,55 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
       const sbJson = await sbRes.json();
       const events = sbJson.events || [];
       const activeEvents = [];
+
+      if (sp === 'ATP' || sp === 'WTA') {
+        for (const ev of events) {
+          for (const grp of (ev.groupings || [])) {
+            const gdn = String(grp.grouping?.displayName || '');
+            if (!gdn.includes('Singles')) continue;
+            for (const comp of (grp.competitions || [])) {
+              const compYmd = String(comp.date || '').slice(0, 10).replace(/-/g, '');
+              if (compYmd !== ymd) continue;
+              const cs = comp.competitors || [];
+              if (cs.length !== 2) continue;
+              const stType = comp.status?.type || {};
+              const state = stType.state || 'pre';
+              const shortDetail = stType.shortDetail || 'Scheduled';
+              const names = cs.map(c => c.athlete?.displayName || '');
+              const ls0 = (cs[0].linescores || []).map(x => Number(x.value || 0));
+              const ls1 = (cs[1].linescores || []).map(x => Number(x.value || 0));
+              const nSets = Math.min(ls0.length, ls1.length);
+              let sets0 = 0, sets1 = 0;
+              for (let si = 0; si < nSets; si++) {
+                const g0 = ls0[si], g1 = ls1[si];
+                const doneSet = (state === 'post') || (si < nSets - 1) || ((g0 >= 6 || g1 >= 6) && Math.abs(g0 - g1) >= 2) || g0 === 7 || g1 === 7;
+                if (doneSet) {
+                  if (g0 > g1) sets0++;
+                  else if (g1 > g0) sets1++;
+                }
+              }
+              if (state === 'post') {
+                if (cs[0].winner && sets0 <= sets1) sets0 = Math.max(sets0, sets1 + 1, 2);
+                else if (cs[1].winner && sets1 <= sets0) sets1 = Math.max(sets1, sets0 + 1, 2);
+              }
+              const pairs = [[0, sets0, sets1, ls0, ls1], [1, sets1, sets0, ls1, ls0]];
+              for (const [idx, meS, oppS, meL, oppL] of pairs) {
+                const meName = names[idx];
+                const oppName = names[1 - idx];
+                const surname = (meName.trim().split(/\s+/).pop() || '').toUpperCase();
+                const setStr = meL.slice(0, Math.min(meL.length, oppL.length)).map((v, i) => `${v}-${oppL[i]}`).join(', ');
+                const scoreStr = state === 'pre'
+                  ? `${meName} vs ${oppName}`
+                  : (state === 'post' ? `${meName} ${meS} - ${oppS} ${oppName}${setStr ? ' (' + setStr + ')' : ''}` : `${meName} ${meS}-${oppS} Sets${setStr ? ' (' + setStr + ')' : ''} vs ${oppName}`);
+                const clockLbl = state === 'post' ? 'Final' : (state === 'pre' ? `Starts ${shortDetail}` : shortDetail);
+                const gDiff = (meL.length && oppL.length) ? (meL[meL.length - 1] - oppL[oppL.length - 1]) : 0;
+                gameMap[`${sp}_${surname}`] = { state, clock: clockLbl, scoreStr, ts: meS, os: oppS, setStr, gDiff, isTennis: true, elapsed: state === 'post' ? 1.0 : 0.5 };
+              }
+            }
+          }
+        }
+        continue;
+      }
 
       for (const ev of events) {
         const comp = (ev.competitions || [])[0];
@@ -1279,54 +1332,57 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
       if (l.raw_market === 'ML') {
         const ts = Number(gInfo.ts || 0);
         const os = Number(gInfo.os || 0);
+        const isTen = Boolean(gInfo.isTennis);
+        const setStr = gInfo.setStr || '';
+        const gDiff = Number(gInfo.gDiff || 0);
         if (gInfo.state === 'pre') {
           l.current = 0;
-          l.target = 1;
-          l.remaining = 1;
+          l.target = isTen ? 2 : 1;
+          l.remaining = isTen ? 2 : 1;
           l.pct = 0;
           l.status = 'pre';
           l.badge = 'Upcoming';
           l.risk_tier = 4;
-          l.sub_stat = '2-Way Moneyline (Incl. OT/SO)';
+          l.sub_stat = isTen ? 'Target: Win 2 Sets (ATP Moneyline)' : '2-Way Moneyline (Incl. OT/SO)';
         } else if (gInfo.state === 'post') {
           if (ts > os) {
             l.current = ts;
-            l.target = Math.max(1, ts);
+            l.target = isTen ? 2 : Math.max(1, ts);
             l.remaining = 0;
             l.pct = 100;
             l.status = 'hit';
             l.badge = 'Hit';
             l.risk_tier = 6;
-            l.sub_stat = `Won ${ts}-${os}`;
+            l.sub_stat = isTen ? `Won ${ts}-${os} Sets${setStr ? ' (' + setStr + ')' : ''}` : `Won ${ts}-${os}`;
           } else {
             l.current = ts;
-            l.target = os + 1;
-            l.remaining = Math.max(1, (os + 1) - ts);
+            l.target = isTen ? 2 : (os + 1);
+            l.remaining = Math.max(1, l.target - ts);
             l.pct = 0;
             l.status = 'red';
             l.badge = 'Missed';
             l.risk_tier = 5;
-            l.sub_stat = `Lost ${ts}-${os}`;
+            l.sub_stat = isTen ? `Lost ${ts}-${os} Sets${setStr ? ' (' + setStr + ')' : ''}` : `Lost ${ts}-${os}`;
           }
         } else {
           l.current = ts;
-          l.target = os + 1;
+          l.target = isTen ? 2 : (os + 1);
           l.remaining = Math.max(0, l.target - l.current);
           const diff = ts - os;
-          l.sub_stat = `Score Margin: ${diff >= 0 ? '+' : ''}${diff}`;
-          if (diff > 0) {
+          l.sub_stat = isTen ? `Sets ${ts}-${os}${setStr ? ' (' + setStr + ')' : ''}` : `Score Margin: ${diff >= 0 ? '+' : ''}${diff}`;
+          if (diff > 0 || (isTen && diff === 0 && gDiff > 0)) {
             l.status = 'green';
-            l.badge = `Leading (${ts}-${os})`;
-            l.pct = 75;
+            l.badge = `Leading (${isTen && setStr ? setStr : ts + '-' + os})`;
+            l.pct = diff > 0 ? 75 : 60;
             l.risk_tier = 2;
-          } else if (diff === 0) {
+          } else if (diff === 0 && (!isTen || gDiff === 0)) {
             l.status = 'yellow';
-            l.badge = `Tied (${ts}-${os})`;
+            l.badge = isTen ? `On Serve (${setStr || '0-0'})` : `Tied (${ts}-${os})`;
             l.pct = 50;
             l.risk_tier = 1;
           } else {
             l.status = 'yellow';
-            l.badge = `Trailing (${ts}-${os})`;
+            l.badge = `Trailing (${isTen && setStr ? setStr : ts + '-' + os})`;
             l.pct = 25;
             l.risk_tier = 1;
           }

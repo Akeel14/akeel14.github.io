@@ -680,7 +680,7 @@
     <div class="date-nav">
       <button class="date-step" id="date-prev" onclick="stepDate(-1)" aria-label="Previous day">‹</button>
       <button class="date-trigger" id="date-trigger" onclick="toggleDateMenu(event)">
-        <span id="date-label">Tue, Nov 10</span>
+        <span id="date-label">Wed, Nov 11</span>
         <span class="chev">▾</span>
       </button>
       <button class="date-step" id="date-next" onclick="stepDate(1)" aria-label="Next day">›</button>
@@ -691,7 +691,7 @@
         <button class="date-step disabled" aria-label="Previous month">‹</button>
         <div class="cal-month-wrap">
           <span class="cal-month">Nov 2026</span>
-          <span class="profit-chip pos" id="cal-total-chip">+$100.44</span>
+          <span class="profit-chip neg" id="cal-total-chip">-$145.28 Total</span>
         </div>
         <button class="date-step disabled" aria-label="Next month">›</button>
       </div>
@@ -723,7 +723,7 @@
 <script>
 let activeCategory = 'singles'; // 'singles' or 'parlays'
 let activeTab = 'P3';           // 'P3' | 'EG' for singles; 'P1' | 'P2' | 'P4' for parlays
-let activeDate = '2026-11-10';
+let activeDate = '2026-11-11';
 let dataStore = null;
 const dateCache = {};
 let prefetchedAll = false;
@@ -731,9 +731,7 @@ let fetchSeq = 0;
 
 const DATE_LABELS = {
   '2026-11-07': 'Sat, Nov 7',
-  '2026-11-08': 'Sun, Nov 8',
-  '2026-11-09': 'Mon, Nov 9',
-  '2026-11-10': 'Tue, Nov 10',
+  '2026-11-11': 'Wed, Nov 11',
 };
 const STAKE_MAP = { P3: '8 Main Singles • $156.10 Staked', P1: 'Parlay 1 ($20 -> $72.87 @ 3.64x)', P2: 'Parlay 2 ($20 -> $62.36 @ 3.12x)' };
 const PROFIT_MAP = { P3: '+$116.64', P1: '+$52.87', P2: '+$42.36' };
@@ -917,14 +915,16 @@ function render() {
   (dataStore.parlays || []).forEach(p => { pMap[p.id] = p; });
 
   // Update Top-Level Category Subtitles
-  const p3Obj = pMap['P3'] || { legs: [], profit_str: '+$0.00' };
+  const p3Obj = pMap['P3'] || { legs: [], net_val: 0, profit_str: '+$0.00' };
   const egObj = pMap['EG'];
   const sLegsTotal = (p3Obj.legs?.length || 0) + (egObj?.legs?.length || 0);
   const sHitsTotal = (p3Obj.legs || []).filter(l => l.status === 'hit').length + (egObj ? egObj.legs.filter(l => l.status === 'hit').length : 0);
   const subSinglesEl = document.getElementById('sub-cat-singles');
   if (subSinglesEl) {
-    const p3Prof = p3Obj.profit_str || PROFIT_MAP['P3'] || '+$0.00';
-    subSinglesEl.innerText = `${p3Prof} • ${sHitsTotal}/${sLegsTotal} Hits`;
+    const sNetComb = Math.round((Number(p3Obj.net_val || 0) + Number(egObj?.net_val || 0)) * 100) / 100;
+    const sSign = sNetComb >= 0 ? '+' : '-';
+    const sProfComb = `${sSign}$${Math.abs(sNetComb).toFixed(2)}`;
+    subSinglesEl.innerText = `${sProfComb} • ${sHitsTotal}/${sLegsTotal} Hits`;
   }
 
   const parlayIds = ['P1', 'P2', 'P4'].filter(id => pMap[id] && (pMap[id].legs || []).length > 0);
@@ -933,12 +933,20 @@ function render() {
     if (parlayIds.length > 0) {
       let totalParlayHits = 0;
       let totalParlayLegs = 0;
+      let pNetComb = 0;
       parlayIds.forEach(id => {
         const legs = pMap[id].legs || [];
         totalParlayLegs += legs.length;
         totalParlayHits += legs.filter(l => l.status === 'hit').length;
+        pNetComb += Number(pMap[id].net_val || 0);
       });
-      subParlaysEl.innerText = `${parlayIds.length} Parlays • ${totalParlayHits}/${totalParlayLegs} Legs`;
+      pNetComb = Math.round(pNetComb * 100) / 100;
+      if (Math.abs(pNetComb) > 0.005) {
+        const pSign = pNetComb >= 0 ? '+' : '-';
+        subParlaysEl.innerText = `${pSign}$${Math.abs(pNetComb).toFixed(2)} • ${totalParlayHits}/${totalParlayLegs} Legs`;
+      } else {
+        subParlaysEl.innerText = `${parlayIds.length} Parlays • ${totalParlayHits}/${totalParlayLegs} Legs`;
+      }
     } else {
       subParlaysEl.innerText = '0 Active Parlays';
     }
@@ -1035,9 +1043,6 @@ function render() {
     const rightInfo = l.sub_stat
       ? l.sub_stat
       : (l.game_state === 'pre' ? '' : (l.remaining > 0 ? `${l.remaining} to go` : 'Target Hit'));
-    const paperTag = (l.paper_trade || activeDate >= '2026-11-08')
-      ? '<span class="paper-badge">PAPER TRADE</span>'
-      : '';
 
     return `
       <div class="leg-card status-${l.status}">
@@ -1053,7 +1058,6 @@ function render() {
             <span class="player-name">${l.player}</span>
             <div class="team-line">
               <span class="team-tag">${l.team}</span>
-              ${paperTag}
             </div>
           </div>
           <span class="pill pill-${l.status}">${l.badge}</span>
@@ -1242,6 +1246,7 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
 
   for (const p of payloadObj.parlays) {
     for (const l of (p.legs || [])) {
+      if (l.settled_fixed) continue;
       const sp = l.raw_sport;
       const tm = normTeam(sp, l.raw_team);
       const gInfo = gameMap[`${sp}_${tm}`];
@@ -1251,7 +1256,62 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
       l.game_clock = gInfo.clock;
       l.game_score = gInfo.scoreStr;
 
-      if (l.raw_player && l.raw_stat) {
+      if (l.raw_market === 'ML') {
+        const ts = Number(gInfo.ts || 0);
+        const os = Number(gInfo.os || 0);
+        if (gInfo.state === 'pre') {
+          l.current = 0;
+          l.target = 1;
+          l.remaining = 1;
+          l.pct = 0;
+          l.status = 'pre';
+          l.badge = 'Upcoming';
+          l.risk_tier = 4;
+          l.sub_stat = '2-Way Moneyline (Incl. OT/SO)';
+        } else if (gInfo.state === 'post') {
+          if (ts > os) {
+            l.current = ts;
+            l.target = Math.max(1, ts);
+            l.remaining = 0;
+            l.pct = 100;
+            l.status = 'hit';
+            l.badge = 'Hit';
+            l.risk_tier = 6;
+            l.sub_stat = `Won ${ts}-${os}`;
+          } else {
+            l.current = ts;
+            l.target = os + 1;
+            l.remaining = Math.max(1, (os + 1) - ts);
+            l.pct = 0;
+            l.status = 'red';
+            l.badge = 'Missed';
+            l.risk_tier = 5;
+            l.sub_stat = `Lost ${ts}-${os}`;
+          }
+        } else {
+          l.current = ts;
+          l.target = os + 1;
+          l.remaining = Math.max(0, l.target - l.current);
+          const diff = ts - os;
+          l.sub_stat = `Score Margin: ${diff >= 0 ? '+' : ''}${diff}`;
+          if (diff > 0) {
+            l.status = 'green';
+            l.badge = `Leading (${ts}-${os})`;
+            l.pct = 75;
+            l.risk_tier = 2;
+          } else if (diff === 0) {
+            l.status = 'yellow';
+            l.badge = `Tied (${ts}-${os})`;
+            l.pct = 50;
+            l.risk_tier = 1;
+          } else {
+            l.status = 'red';
+            l.badge = `Trailing (${ts}-${os})`;
+            l.pct = 25;
+            l.risk_tier = 0;
+          }
+        }
+      } else if (l.raw_player && l.raw_stat) {
         const pKey = `${sp}_${tm}_${normPlayerName(l.raw_player)}`;
         const pStats = playerMap[pKey];
         const curVal = pStats && pStats[l.raw_stat] !== undefined ? Number(pStats[l.raw_stat]) : 0;
@@ -1277,7 +1337,7 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
           if (curVal > ln) {
             l.status = 'hit';
             l.badge = 'Hit';
-            l.risk_tier = 6;
+            l.risk_tier = gInfo.state === 'in' ? 3 : 6;
           } else if (gInfo.state === 'post') {
             l.status = 'red';
             l.badge = 'Missed';
@@ -1316,38 +1376,46 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
       }
     }
 
-    // Recompute parlay/singles group net_val & profit_str
+    // Recompute parlay/singles group net_val & profit_str using exact real-money stakes & payouts
     const legs = p.legs || [];
     if (p.id === 'P3' || p.id === 'EG') {
       let sNet = 0;
+      let grpRisk = 0;
       let sw = 0;
       let sl = 0;
       for (const l of legs) {
+        const stake = Number(l.stake ?? 20.0);
         const odds = Number(l.raw_odds || 1.9);
+        const payout = l.exact_payout !== undefined ? Number(l.exact_payout) : stake * odds;
+        grpRisk += stake;
         if (l.status === 'hit') {
-          sNet += (odds - 1.0) * 20.0;
+          sNet += (payout - stake);
           sw++;
         } else if (l.status === 'red' && (l.game_state === 'post' || l.raw_side === 'U')) {
-          sNet -= 20.0;
+          sNet -= stake;
           sl++;
         }
       }
+      p.risk_val = Math.round(grpRisk * 100) / 100;
       p.net_val = Math.round(sNet * 100) / 100;
       const sign = p.net_val >= 0 ? '+' : '-';
       p.profit_str = `${sign}$${Math.abs(p.net_val).toFixed(2)}`;
-      p.name = `$${(legs.length * 20).toFixed(0)} Risk • ${sw}-${sl} Settled`;
+      const riskStr = p.risk_val % 1 === 0 ? p.risk_val.toFixed(0) : p.risk_val.toFixed(2);
+      p.name = `$${riskStr} Risk • ${sw}-${sl} Settled`;
     } else if (legs.length >= 2) {
+      const pStake = Number(p.risk_val ?? 20.0);
       const oComb = Math.round(legs.reduce((acc, l) => acc * Number(l.raw_odds || 1.9), 1.0) * 100) / 100;
-      const netP = 20.0 * (oComb - 1.0);
+      const toRet = p.to_return !== undefined ? Number(p.to_return) : Math.round(pStake * oComb * 100) / 100;
+      const netP = Math.round((toRet - pStake) * 100) / 100;
       if (legs.every(l => l.status === 'hit')) {
-        p.net_val = Math.round(netP * 100) / 100;
+        p.net_val = netP;
         p.profit_str = `+$${netP.toFixed(2)}`;
       } else if (legs.some(l => l.status === 'red' && (l.game_state === 'post' || l.raw_side === 'U'))) {
-        p.net_val = -20.0;
-        p.profit_str = '-$20.00';
+        p.net_val = -pStake;
+        p.profit_str = `-$${pStake.toFixed(2)}`;
       } else {
         p.net_val = 0.0;
-        p.profit_str = `+$0.00 (To Win +$${netP.toFixed(2)})`;
+        p.profit_str = `To Win +$${netP.toFixed(2)}`;
       }
     }
     dayRiskTotal += Number(p.risk_val || 0);

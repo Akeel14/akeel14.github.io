@@ -444,6 +444,9 @@
   .leg-card.status-hit {
     border-color: rgba(16, 185, 129, 0.45);
   }
+  .leg-card.status-yellow {
+    border-color: rgba(245, 158, 11, 0.42);
+  }
   .leg-card.status-red {
     border-color: rgba(239, 68, 68, 0.35);
   }
@@ -1143,6 +1146,23 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
         const stType = comp.status?.type || {};
         const state = stType.state || 'pre'; // 'pre' | 'in' | 'post'
         const shortDetail = stType.shortDetail || 'Scheduled';
+        const period = Number(comp.status?.period || 1);
+        const dispClock = String(comp.status?.displayClock || '');
+        let elapsed = state === 'post' ? 1.0 : 0.0;
+        if (state === 'in') {
+          let remMins = 0.0;
+          const detLow = shortDetail.toLowerCase();
+          if (!detLow.includes('halftime') && !detLow.includes('end of') && !detLow.includes('intermission')) {
+            const cm = dispClock.trim().match(/^(\d+):(\d+)/);
+            if (cm) remMins = Number(cm[1]) + Number(cm[2]) / 60.0;
+            else if (dispClock.trim()) remMins = (Number(dispClock) || 0) / 60.0;
+          }
+          const pLen = sp === 'NHL' ? 20.0 : (sp === 'NCAAB' ? 20.0 : (sp === 'NFL' ? 15.0 : 12.0));
+          const totLen = sp === 'NHL' ? 60.0 : (sp === 'NCAAB' ? 40.0 : (sp === 'NFL' ? 60.0 : 48.0));
+          const maxRegP = (sp === 'NHL') ? 3 : (sp === 'NCAAB' ? 2 : 4);
+          const elMins = (Math.min(Math.max(1, period), maxRegP) - 1) * pLen + Math.max(0.0, pLen - remMins);
+          elapsed = Math.max(0.02, Math.min(1.0, elMins / totLen));
+        }
         const competitors = comp.competitors || [];
         if (competitors.length < 2) continue;
         const home = competitors.find(c => c.homeAway === 'home') || competitors[0];
@@ -1158,8 +1178,8 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
           : `${aName} ${aScore} - ${hScore} ${hName}`;
         const clockLbl = state === 'post' ? 'Final' : (state === 'pre' ? `Starts ${shortDetail.split(' - ').pop()}` : shortDetail);
 
-        gameMap[`${sp}_${hAbbr}`] = { state, clock: clockLbl, scoreStr, ts: hScore, os: aScore, eventId: ev.id };
-        gameMap[`${sp}_${aAbbr}`] = { state, clock: clockLbl, scoreStr, ts: aScore, os: hScore, eventId: ev.id };
+        gameMap[`${sp}_${hAbbr}`] = { state, clock: clockLbl, scoreStr, ts: hScore, os: aScore, elapsed, eventId: ev.id };
+        gameMap[`${sp}_${aAbbr}`] = { state, clock: clockLbl, scoreStr, ts: aScore, os: hScore, elapsed, eventId: ev.id };
 
         if (state === 'in' || state === 'post') {
           const neededTeams = new Set(allLegs.filter(l => l.raw_sport === sp).map(l => normTeam(sp, l.raw_team)));
@@ -1305,10 +1325,10 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
             l.pct = 50;
             l.risk_tier = 1;
           } else {
-            l.status = 'red';
+            l.status = 'yellow';
             l.badge = `Trailing (${ts}-${os})`;
             l.pct = 25;
-            l.risk_tier = 0;
+            l.risk_tier = 1;
           }
         }
       } else if (l.raw_player && l.raw_stat) {
@@ -1343,9 +1363,17 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
             l.badge = 'Missed';
             l.risk_tier = 5;
           } else {
-            l.status = 'green';
-            l.badge = 'In Play';
-            l.risk_tier = 2;
+            const el = Number(gInfo.elapsed || 0.25);
+            const reqRate = tgt * el;
+            if (curVal >= reqRate * 0.80 || el < 0.20) {
+              l.status = 'green';
+              l.badge = 'On Pace';
+              l.risk_tier = 2;
+            } else {
+              l.status = 'yellow';
+              l.badge = `Behind Pace • ${tgt - curVal} to go`;
+              l.risk_tier = 1;
+            }
           }
         } else if (side === 'U') {
           l.target = ln;
@@ -1353,7 +1381,7 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
           if (curVal > ln) {
             l.status = 'red';
             l.badge = gInfo.state === 'in' ? 'Over (Lost)' : 'Missed';
-            l.pct = 0;
+            l.pct = 100;
             l.risk_tier = gInfo.state === 'in' ? 0 : 5;
           } else if (gInfo.state === 'post') {
             l.status = 'hit';
@@ -1362,9 +1390,22 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
             l.risk_tier = 6;
           } else {
             l.pct = Math.min(100, Math.round((curVal / Math.max(0.5, ln)) * 1000) / 10);
-            if (curVal === Math.floor(ln)) {
+            const el = Number(gInfo.elapsed || 0.25);
+            const maxAllowed = Math.floor(ln);
+            const remAllowed = maxAllowed - curVal;
+            const usedFrac = curVal / Math.max(0.5, ln);
+            const linPace = ln * Math.max(el, 0.18);
+            if (remAllowed === 0) {
               l.status = 'yellow';
               l.badge = `At Limit (${curVal})`;
+              l.risk_tier = 1;
+            } else if ((usedFrac >= 0.72 && el <= 0.75) || (curVal >= linPace * 1.38 && usedFrac >= 0.50)) {
+              l.status = 'yellow';
+              l.badge = `Danger • ${remAllowed} Left`;
+              l.risk_tier = 1;
+            } else if (curVal > linPace && (curVal >= 2 || usedFrac >= 0.40)) {
+              l.status = 'yellow';
+              l.badge = `Over Pace • ${remAllowed} Left`;
               l.risk_tier = 1;
             } else {
               l.status = 'green';

@@ -368,6 +368,14 @@
   .tab.active .tab-sub {
     color: #94a3b8;
   }
+  .tab-sub.sub-neg, .tab.active .tab-sub.sub-neg {
+    color: #f87171;
+    font-weight: 600;
+  }
+  .tab-sub.sub-pos, .tab.active .tab-sub.sub-pos {
+    color: #34d399;
+    font-weight: 600;
+  }
 
   /* Sub-Filter Pill Strip (Morning/Main Card or Parlay 1/2/3 — Always 1 Row) */
   .sort-bar {
@@ -402,13 +410,127 @@
     font-variant-numeric: tabular-nums;
   }
   .sort-pill.active {
-    background: rgba(16, 185, 129, 0.13);
+    background: #1c222d;
     color: var(--text);
-    border-color: rgba(16, 185, 129, 0.45);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+    border-color: rgba(56, 189, 248, 0.52);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
   }
   .sort-pill.active .sort-pill-sub {
+    color: #93c5fd;
+  }
+  .sort-pill.pill-won {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: #d1fae5;
+  }
+  .sort-pill.pill-won .sort-pill-sub {
+    color: #34d399;
+    font-weight: 600;
+  }
+  .sort-pill.pill-won.active {
+    background: rgba(16, 185, 129, 0.20);
+    color: #fff;
+    border-color: #10b981;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.20);
+  }
+  .sort-pill.pill-won.active .sort-pill-sub {
     color: #6ee7b7;
+  }
+  .sort-pill.pill-lost {
+    background: rgba(239, 68, 68, 0.09);
+    border-color: rgba(239, 68, 68, 0.38);
+    color: #fecaca;
+  }
+  .sort-pill.pill-lost .sort-pill-sub {
+    color: #f87171;
+    font-weight: 600;
+  }
+  .sort-pill.pill-lost.active {
+    background: rgba(239, 68, 68, 0.22);
+    color: #fff;
+    border-color: #ef4444;
+    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.24);
+  }
+  .sort-pill.pill-lost.active .sort-pill-sub {
+    color: #fca5a5;
+  }
+  .sort-pill-sub.sub-neg, .sort-pill.active .sort-pill-sub.sub-neg {
+    color: #f87171;
+  }
+  .sort-pill-sub.sub-pos, .sort-pill.active .sort-pill-sub.sub-pos {
+    color: #34d399;
+  }
+
+  /* Parlay Ticket Status Banner */
+  .parlay-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: #13171f;
+  }
+  .parlay-banner.lost {
+    background: rgba(239, 68, 68, 0.13);
+    border-color: rgba(239, 68, 68, 0.45);
+  }
+  .parlay-banner.won {
+    background: rgba(16, 185, 129, 0.13);
+    border-color: rgba(16, 185, 129, 0.45);
+  }
+  .parlay-banner.open {
+    background: rgba(56, 189, 248, 0.08);
+    border-color: rgba(56, 189, 248, 0.30);
+  }
+  .pb-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .pb-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .parlay-banner.lost .pb-title {
+    color: #fee2e2;
+  }
+  .parlay-banner.won .pb-title {
+    color: #ecfdf5;
+  }
+  .pb-sub {
+    font-size: 11px;
+    font-weight: 500;
+    color: #94a3b8;
+    font-variant-numeric: tabular-nums;
+  }
+  .pb-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 99px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .pb-badge.lost {
+    background: rgba(239, 68, 68, 0.22);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.45);
+  }
+  .pb-badge.won {
+    background: rgba(16, 185, 129, 0.22);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.45);
+  }
+  .pb-badge.open {
+    background: rgba(56, 189, 248, 0.16);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.35);
   }
 
   /* Paper Trade Tag */
@@ -771,14 +893,72 @@ document.addEventListener('click', (e) => {
   }
 });
 
+function isLegSettled(l) {
+  if (!l) return true;
+  if (l.is_void || String(l.badge || '').includes('Void')) return true;
+  if (l.game_state === 'post') return true;
+  if (l.status === 'red' && l.raw_side === 'U') return true;
+  return false;
+}
+
+function isParlayDead(p) {
+  if (!p || !Array.isArray(p.legs) || p.legs.length === 0) return false;
+  if (Number(p.net_val || 0) < -0.005) return true;
+  return p.legs.some(l => l.status === 'red' && (l.game_state === 'post' || l.raw_side === 'U'));
+}
+
+function isParlayWon(p) {
+  if (!p || !Array.isArray(p.legs) || p.legs.length === 0) return false;
+  if (Number(p.net_val || 0) > 0.005 && p.legs.every(l => isLegSettled(l))) return true;
+  return p.legs.every(l => l.status === 'hit' || l.is_void || String(l.badge || '').includes('Void'));
+}
+
+function isParlayOpen(p) {
+  return Boolean(p && Array.isArray(p.legs) && p.legs.length > 0 && !isParlayDead(p) && !isParlayWon(p));
+}
+
+function getSinglesCardVisualClass(grp) {
+  if (!grp || !Array.isArray(grp.legs) || grp.legs.length === 0) return 'pill-open';
+  const hasOpen = grp.legs.some(l => !isLegSettled(l));
+  const net = Number(grp.net_val || 0);
+  if (!hasOpen && net < -0.005) return 'pill-lost';
+  if (!hasOpen && net > 0.005) return 'pill-won';
+  return 'pill-open';
+}
+
+function getParlayVisualClass(p) {
+  if (isParlayDead(p)) return 'pill-lost';
+  if (isParlayWon(p)) return 'pill-won';
+  return 'pill-open';
+}
+
 function getDefaultSinglesTab(payloadObj) {
   if (!payloadObj || !payloadObj.parlays) return 'P3';
   const eg = payloadObj.parlays.find(p => p.id === 'EG');
-  if (eg && Array.isArray(eg.legs) && eg.legs.length > 0) {
-    const hasUnsettled = eg.legs.some(l => l.game_state !== 'post');
-    if (hasUnsettled) return 'EG';
-  }
+  const p3 = payloadObj.parlays.find(p => p.id === 'P3');
+  const egOpen = Boolean(eg && Array.isArray(eg.legs) && eg.legs.some(l => !isLegSettled(l)));
+  const egLive = Boolean(eg && Array.isArray(eg.legs) && eg.legs.some(l => l.game_state === 'in' && !isLegSettled(l)));
+  const p3Open = Boolean(p3 && Array.isArray(p3.legs) && p3.legs.some(l => !isLegSettled(l)));
+  if (egLive) return 'EG';
+  if (egOpen && !p3Open) return 'EG';
+  if (p3 && Array.isArray(p3.legs) && p3.legs.length > 0) return 'P3';
+  if (eg && Array.isArray(eg.legs) && eg.legs.length > 0) return 'EG';
   return 'P3';
+}
+
+function getDefaultParlayTab(payloadObj) {
+  if (!payloadObj || !payloadObj.parlays) return 'P1';
+  const pMap = {};
+  payloadObj.parlays.forEach(p => { pMap[p.id] = p; });
+  const pList = ['P1', 'P2', 'P4'].map(id => pMap[id]).filter(p => p && Array.isArray(p.legs) && p.legs.length > 0);
+  if (pList.length === 0) return 'P1';
+  const liveOpen = pList.find(p => isParlayOpen(p) && p.legs.some(l => l.game_state === 'in'));
+  if (liveOpen) return liveOpen.id;
+  const firstOpen = pList.find(p => isParlayOpen(p));
+  if (firstOpen) return firstOpen.id;
+  const firstWon = pList.find(p => isParlayWon(p));
+  if (firstWon) return firstWon.id;
+  return pList[0].id;
 }
 
 function selectDate(dt) {
@@ -793,9 +973,7 @@ function selectDate(dt) {
   // Instant 0ms switch if already cached in memory!
   if (dateCache[dt]) {
     dataStore = dateCache[dt];
-    if (activeCategory === 'singles') {
-      activeTab = getDefaultSinglesTab(dataStore);
-    }
+    activeTab = activeCategory === 'singles' ? getDefaultSinglesTab(dataStore) : getDefaultParlayTab(dataStore);
     const st = document.getElementById('sync-text');
     if (st) st.innerText = dataStore.settled_permanent ? 'Settled Final' : ('Updated ' + dataStore.updated_at);
     render();
@@ -825,12 +1003,25 @@ function selectCategory(cat) {
   activeCategory = cat;
   document.getElementById('cat-singles')?.classList.toggle('active', cat === 'singles');
   document.getElementById('cat-parlays')?.classList.toggle('active', cat === 'parlays');
+  const pMap = {};
+  (dataStore?.parlays || []).forEach(p => { pMap[p.id] = p; });
   if (cat === 'singles') {
     if (activeTab !== 'P3' && activeTab !== 'EG') {
       activeTab = getDefaultSinglesTab(dataStore);
+    } else {
+      const curGrp = pMap[activeTab];
+      const curHasOpen = curGrp && (curGrp.legs || []).some(l => !isLegSettled(l));
+      const defSingle = getDefaultSinglesTab(dataStore);
+      const defHasOpen = pMap[defSingle] && (pMap[defSingle].legs || []).some(l => !isLegSettled(l));
+      if (!curHasOpen && defHasOpen) activeTab = defSingle;
     }
   } else {
-    if (activeTab !== 'P1' && activeTab !== 'P2' && activeTab !== 'P4') activeTab = 'P1';
+    const validIds = ['P1', 'P2', 'P4'].filter(id => pMap[id] && (pMap[id].legs || []).length > 0);
+    if (!validIds.includes(activeTab)) {
+      activeTab = getDefaultParlayTab(dataStore);
+    } else if (isParlayDead(pMap[activeTab]) && validIds.some(id => isParlayOpen(pMap[id]))) {
+      activeTab = getDefaultParlayTab(dataStore);
+    }
   }
   render();
 }
@@ -928,7 +1119,11 @@ function render() {
     const sNetComb = Math.round((Number(p3Obj.net_val || 0) + Number(egObj?.net_val || 0)) * 100) / 100;
     const sSign = sNetComb >= 0 ? '+' : '-';
     const sProfComb = `${sSign}$${Math.abs(sNetComb).toFixed(2)}`;
-    subSinglesEl.innerText = `${sProfComb} • ${sHitsTotal}/${sLegsTotal} Hits`;
+    const sOpenCnt = (p3Obj.legs || []).filter(l => !isLegSettled(l)).length + (egObj ? egObj.legs.filter(l => !isLegSettled(l)).length : 0);
+    subSinglesEl.className = 'tab-sub' + (sNetComb < -0.005 ? ' sub-neg' : (sNetComb > 0.005 ? ' sub-pos' : ''));
+    subSinglesEl.innerText = sOpenCnt > 0
+      ? `${sProfComb} • ${sOpenCnt} Open`
+      : `${sProfComb} • ${sHitsTotal}/${sLegsTotal} Hits`;
   }
 
   const parlayIds = ['P1', 'P2', 'P4'].filter(id => pMap[id] && (pMap[id].legs || []).length > 0);
@@ -938,20 +1133,32 @@ function render() {
       let totalParlayHits = 0;
       let totalParlayLegs = 0;
       let pNetComb = 0;
+      let openParlayCnt = 0;
+      let lostParlayCnt = 0;
       parlayIds.forEach(id => {
-        const legs = pMap[id].legs || [];
+        const p = pMap[id];
+        const legs = p.legs || [];
         totalParlayLegs += legs.length;
         totalParlayHits += legs.filter(l => l.status === 'hit').length;
-        pNetComb += Number(pMap[id].net_val || 0);
+        pNetComb += Number(p.net_val || 0);
+        if (isParlayOpen(p)) openParlayCnt++;
+        else if (isParlayDead(p)) lostParlayCnt++;
       });
       pNetComb = Math.round(pNetComb * 100) / 100;
-      if (Math.abs(pNetComb) > 0.005) {
+      subParlaysEl.className = 'tab-sub' + (pNetComb < -0.005 && openParlayCnt === 0 ? ' sub-neg' : (pNetComb > 0.005 ? ' sub-pos' : ''));
+      if (openParlayCnt > 0 && lostParlayCnt > 0) {
+        const pSign = pNetComb >= 0 ? '+' : '-';
+        subParlaysEl.innerText = `${openParlayCnt} Open • ${lostParlayCnt} Lost (${pSign}$${Math.abs(pNetComb).toFixed(0)})`;
+      } else if (openParlayCnt > 0) {
+        subParlaysEl.innerText = `${openParlayCnt} Open • ${totalParlayHits}/${totalParlayLegs} Legs`;
+      } else if (Math.abs(pNetComb) > 0.005) {
         const pSign = pNetComb >= 0 ? '+' : '-';
         subParlaysEl.innerText = `${pSign}$${Math.abs(pNetComb).toFixed(2)} • ${totalParlayHits}/${totalParlayLegs} Legs`;
       } else {
         subParlaysEl.innerText = `${parlayIds.length} Parlays • ${totalParlayHits}/${totalParlayLegs} Legs`;
       }
     } else {
+      subParlaysEl.className = 'tab-sub';
       subParlaysEl.innerText = '0 Active Parlays';
     }
   }
@@ -960,10 +1167,10 @@ function render() {
   if (activeCategory === 'singles') {
     if (activeTab === 'EG' && (!egObj || !(egObj.legs || []).length)) activeTab = 'P3';
     else if (activeTab === 'P3' && !(p3Obj.legs || []).length && egObj && (egObj.legs || []).length) activeTab = 'EG';
-    if (activeTab !== 'P3' && activeTab !== 'EG') activeTab = (p3Obj.legs || []).length ? 'P3' : 'EG';
+    if (activeTab !== 'P3' && activeTab !== 'EG') activeTab = getDefaultSinglesTab(dataStore);
   } else {
     if (!parlayIds.includes(activeTab)) {
-      activeTab = parlayIds[0] || 'P1';
+      activeTab = getDefaultParlayTab(dataStore);
     }
   }
 
@@ -974,21 +1181,31 @@ function render() {
       pillsEl.innerHTML = '';
     } else if (activeCategory === 'singles') {
       const mainHits = (p3Obj.legs || []).filter(l => l.status === 'hit').length;
+      const mainOpen = (p3Obj.legs || []).filter(l => !isLegSettled(l)).length;
       const mainProf = p3Obj.profit_str || PROFIT_MAP['P3'] || '+$0.00';
+      const mainVis = getSinglesCardVisualClass(p3Obj);
+      const mainNet = Number(p3Obj.net_val || 0);
+      const mainSubCls = mainVis === 'pill-open' ? (mainNet < -0.005 ? ' sub-neg' : (mainNet > 0.005 ? ' sub-pos' : '')) : '';
+      const mainStatusTxt = mainOpen > 0 && mainHits === 0 && Math.abs(mainNet) < 0.005
+        ? `${mainOpen} Open`
+        : `${mainProf} • ${mainHits}/${(p3Obj.legs || []).length}`;
       let pillsHtml = '';
       if (egObj && (egObj.legs || []).length > 0) {
         const egHits = egObj.legs.filter(l => l.status === 'hit').length;
+        const egVis = getSinglesCardVisualClass(egObj);
+        const egNet = Number(egObj.net_val || 0);
+        const egSubCls = egVis === 'pill-open' ? (egNet < -0.005 ? ' sub-neg' : (egNet > 0.005 ? ' sub-pos' : '')) : '';
         pillsHtml += `
-          <button class="sort-pill ${activeTab === 'EG' ? 'active' : ''}" onclick="selectSubTab('EG')">
+          <button class="sort-pill ${egVis} ${activeTab === 'EG' ? 'active' : ''}" onclick="selectSubTab('EG')">
             <span>Morning Card (${egObj.legs.length})</span>
-            <span class="sort-pill-sub">${egObj.profit_str || ''} • ${egHits}/${egObj.legs.length}</span>
+            <span class="sort-pill-sub${egSubCls}">${egObj.profit_str || ''} • ${egHits}/${egObj.legs.length}</span>
           </button>
         `;
       }
       pillsHtml += `
-        <button class="sort-pill ${activeTab === 'P3' ? 'active' : ''}" onclick="selectSubTab('P3')">
+        <button class="sort-pill ${mainVis} ${activeTab === 'P3' ? 'active' : ''}" onclick="selectSubTab('P3')">
           <span>Main Card (${(p3Obj.legs || []).length})</span>
-          <span class="sort-pill-sub">${mainProf} • ${mainHits}/${(p3Obj.legs || []).length}</span>
+          <span class="sort-pill-sub${mainSubCls}">${mainStatusTxt}</span>
         </button>
       `;
       pillsEl.innerHTML = pillsHtml;
@@ -999,10 +1216,14 @@ function render() {
         pillsEl.innerHTML = parlayIds.map((pid, idx) => {
           const p = pMap[pid];
           const hits = (p.legs || []).filter(l => l.status === 'hit').length;
-          const prof = p.profit_str || PROFIT_MAP[pid] || '';
+          const pVis = getParlayVisualClass(p);
+          const pTitle = p.label || `Parlay ${idx + 1}`;
+          const prof = pVis === 'pill-lost'
+            ? `Lost ${p.profit_str || ''}`
+            : (p.profit_str || PROFIT_MAP[pid] || '');
           return `
-            <button class="sort-pill ${activeTab === pid ? 'active' : ''}" onclick="selectSubTab('${pid}')">
-              <span>Parlay ${idx + 1}</span>
+            <button class="sort-pill ${pVis} ${activeTab === pid ? 'active' : ''}" onclick="selectSubTab('${pid}')">
+              <span>${pTitle}</span>
               <span class="sort-pill-sub">${prof} • ${hits}/${(p.legs || []).length}</span>
             </button>
           `;
@@ -1039,9 +1260,41 @@ function render() {
     return;
   }
 
+  let bannerHtml = '';
+  if (activeCategory === 'parlays' && parlay) {
+    const pStake = Number(parlay.risk_val ?? 15.0);
+    const oComb = parlay.odds_comb
+      ? Number(parlay.odds_comb)
+      : Math.round(rawLegs.reduce((acc, l) => acc * Number(l.raw_odds || 1.9), 1.0) * 100) / 100;
+    const toRet = parlay.to_return !== undefined
+      ? Number(parlay.to_return)
+      : Math.round(pStake * oComb * 100) / 100;
+    const pIdx = parlayIds.indexOf(activeTab);
+    const bTitle = `${parlay.label || ('Parlay ' + (pIdx >= 0 ? pIdx + 1 : 1))}${oComb ? ' • ' + oComb.toFixed(2) + 'x' : ''}`;
+    const bSub = `$${pStake.toFixed(2)} Stake → $${toRet.toFixed(2)} Payout`;
+    let bCls = 'open';
+    let bBadge = `OPEN • To Win +$${Math.max(0, toRet - pStake).toFixed(2)}`;
+    if (isParlayDead(parlay)) {
+      bCls = 'lost';
+      bBadge = `LOST -$${pStake.toFixed(2)}`;
+    } else if (isParlayWon(parlay)) {
+      bCls = 'won';
+      bBadge = `WON +$${Math.max(0, toRet - pStake).toFixed(2)}`;
+    }
+    bannerHtml = `
+      <div class="parlay-banner ${bCls}">
+        <div class="pb-left">
+          <span class="pb-title">${bTitle}</span>
+          <span class="pb-sub">${bSub}</span>
+        </div>
+        <span class="pb-badge ${bCls}">${bBadge}</span>
+      </div>
+    `;
+  }
+
   const sortedLegs = sortLegsByRisk(rawLegs);
 
-  container.innerHTML = sortedLegs.map(l => {
+  container.innerHTML = bannerHtml + sortedLegs.map(l => {
     const isLive = l.game_state === 'in';
     const pctNum = l.status === 'pre' ? 0 : Math.min(100, Math.max(0, l.pct));
     const knobPos = Math.min(96, Math.max(4, pctNum));
@@ -1087,6 +1340,7 @@ const ESPN_SPORT_PATH = {
   NBA: 'basketball/nba',
   NHL: 'hockey/nhl',
   NFL: 'football/nfl',
+  NCAAF: 'football/college-football',
   NCAAB: 'basketball/mens-college-basketball',
   ATP: 'tennis/atp',
   WTA: 'tennis/wta',
@@ -1214,8 +1468,8 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
             if (cm) remMins = Number(cm[1]) + Number(cm[2]) / 60.0;
             else if (dispClock.trim()) remMins = (Number(dispClock) || 0) / 60.0;
           }
-          const pLen = sp === 'NHL' ? 20.0 : (sp === 'NCAAB' ? 20.0 : (sp === 'NFL' ? 15.0 : 12.0));
-          const totLen = sp === 'NHL' ? 60.0 : (sp === 'NCAAB' ? 40.0 : (sp === 'NFL' ? 60.0 : 48.0));
+          const pLen = sp === 'NHL' ? 20.0 : (sp === 'NCAAB' ? 20.0 : ((sp === 'NFL' || sp === 'NCAAF') ? 15.0 : 12.0));
+          const totLen = sp === 'NHL' ? 60.0 : (sp === 'NCAAB' ? 40.0 : ((sp === 'NFL' || sp === 'NCAAF') ? 60.0 : 48.0));
           const maxRegP = (sp === 'NHL') ? 3 : (sp === 'NCAAB' ? 2 : 4);
           const elMins = (Math.min(Math.max(1, period), maxRegP) - 1) * pLen + Math.max(0.0, pLen - remMins);
           elapsed = Math.max(0.02, Math.min(1.0, elMins / totLen));
@@ -1348,6 +1602,8 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
           l.status = 'pre';
           l.badge = 'Void ($15 Refund)';
           l.risk_tier = 6;
+          l.is_void = true;
+          l.game_state = 'post';
           l.sub_stat = 'Walkover • Ticket Refunded ($0.00 Net)';
         } else if (gInfo.state === 'pre') {
           l.current = 0;
@@ -1398,6 +1654,58 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
             l.status = 'yellow';
             l.badge = `Trailing (${isTen && setStr ? setStr : ts + '-' + os})`;
             l.pct = 25;
+            l.risk_tier = 1;
+          }
+        }
+      } else if (l.raw_market === 'SP') {
+        const ts = Number(gInfo.ts || 0);
+        const os = Number(gInfo.os || 0);
+        const ln = Number(l.raw_line || 0);
+        const lnFmt = (ln >= 0 ? '+' : '') + ln.toFixed(1);
+        const cov = (ts - os) + ln;
+        const neededPts = Math.max(0, Math.floor(os - ln) + 1);
+        if (gInfo.state === 'pre') {
+          l.current = 0;
+          l.target = lnFmt;
+          l.remaining = 0;
+          l.pct = 0;
+          l.status = 'pre';
+          l.badge = 'Upcoming';
+          l.risk_tier = 4;
+          l.sub_stat = `Spread Cushion: ${lnFmt} pts`;
+        } else if (gInfo.state === 'post') {
+          l.current = ts;
+          l.target = neededPts;
+          if (cov > 0) {
+            l.remaining = 0;
+            l.pct = 100;
+            l.status = 'hit';
+            l.badge = 'Covered';
+            l.risk_tier = 6;
+            l.sub_stat = `Covered ${lnFmt} (${ts}-${os})`;
+          } else {
+            l.remaining = Math.max(1, neededPts - ts);
+            l.pct = 0;
+            l.status = 'red';
+            l.badge = 'Missed';
+            l.risk_tier = 5;
+            l.sub_stat = `Missed ${lnFmt} (${ts}-${os})`;
+          }
+        } else {
+          l.current = ts;
+          l.target = neededPts;
+          l.remaining = Math.max(0, neededPts - ts);
+          const covFmt = (cov >= 0 ? '+' : '') + cov.toFixed(1);
+          l.sub_stat = `Spread Margin: ${covFmt} (Line ${lnFmt})`;
+          if (cov > 0) {
+            l.status = 'green';
+            l.badge = `Covering (${covFmt})`;
+            l.pct = cov >= Math.abs(ln) ? 85 : 68;
+            l.risk_tier = 2;
+          } else {
+            l.status = 'yellow';
+            l.badge = `Behind (${covFmt})`;
+            l.pct = Math.max(15, Math.round((ts / Math.max(1, neededPts)) * 100));
             l.risk_tier = 1;
           }
         }
@@ -1606,8 +1914,8 @@ async function fetchLive(isManual) {
     }
     if (mySeq !== fetchSeq || activeDate !== reqDt) return;
     dataStore = json;
-    if (isManual && activeCategory === 'singles') {
-      activeTab = getDefaultSinglesTab(dataStore);
+    if (isManual) {
+      activeTab = activeCategory === 'singles' ? getDefaultSinglesTab(dataStore) : getDefaultParlayTab(dataStore);
     }
     if (st) st.innerText = dataStore.settled_permanent ? 'Settled Final' : ('Updated ' + dataStore.updated_at);
     render();

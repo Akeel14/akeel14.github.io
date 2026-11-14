@@ -3,247 +3,282 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Overtime 24/7 Singles Sniper</title>
+<title>Singles Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #090a0c;
-    --card: #121418;
-    --card-border: rgba(255, 255, 255, 0.08);
-    --text: #f4f4f6;
-    --muted: #8a8f98;
+    --bg: #090a0f;
+    --surface: #11131a;
+    --surface-hover: #161922;
+    --inset: #0b0d12;
+    --border: rgba(255, 255, 255, 0.075);
+    --border-strong: rgba(255, 255, 255, 0.13);
+    --text: #f8fafc;
+    --text-sec: #94a3b8;
+    --text-muted: #64748b;
     --green: #10b981;
-    --green-bg: rgba(16, 185, 129, 0.12);
-    --yellow: #f59e0b;
-    --yellow-bg: rgba(245, 158, 11, 0.12);
-    --red: #ef4444;
-    --red-bg: rgba(239, 68, 68, 0.12);
-    --pre: #64748b;
-    --pre-bg: rgba(100, 116, 139, 0.12);
+    --green-bright: #34d399;
+    --green-soft: rgba(16, 185, 129, 0.11);
+    --green-border: rgba(16, 185, 129, 0.28);
+    --red: #f43f5e;
+    --red-bright: #fb7185;
+    --red-soft: rgba(244, 63, 94, 0.11);
+    --red-border: rgba(244, 63, 94, 0.28);
+    --amber: #f59e0b;
+    --amber-bright: #fbbf24;
+    --amber-soft: rgba(245, 158, 11, 0.08);
+    --amber-border: rgba(245, 158, 11, 0.24);
+    --sky: #38bdf8;
+    --sky-soft: rgba(56, 189, 248, 0.11);
+    --sky-border: rgba(56, 189, 248, 0.28);
   }
+
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
   }
-  *::-webkit-scrollbar {
-    display: none;
-    width: 0 !important;
-    height: 0 !important;
-    background: transparent;
-  }
+
   html, body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-    max-width: 100vw;
   }
+
   body {
-    padding: 16px 14px 48px;
+    padding: 18px 16px 64px;
+    min-height: 100vh;
   }
-  .wrap {
-    max-width: 640px;
-    margin: 0 auto;
-  }
-  @media (min-width: 600px) {
+
+  @media (min-width: 640px) {
     body {
-      padding: 24px 20px 60px;
+      padding: 32px 24px 80px;
     }
   }
 
-  /* Minimal Header + Custom Date Picker */
-  .header {
+  .wrap {
+    max-width: 660px;
+    margin: 0 auto;
+  }
+
+  /* Top App Bar */
+  .topbar {
     position: relative;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 14px;
+    gap: 12px;
+    margin-bottom: 18px;
   }
-  .header-left {
+
+  .brand-col {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 5px;
     min-width: 0;
   }
-  .sync-status {
+
+  .brand-row {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--muted);
-    white-space: nowrap;
+    gap: 8px;
   }
-  .dot {
+
+  .brand-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--text);
+  }
+
+  .engine-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-sec);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .engine-status .pulse-dot {
+    margin-top: 5px;
+  }
+
+  .pulse-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
     background: var(--green);
-    box-shadow: 0 0 8px var(--green);
-    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55);
+    animation: livePulse 2.4s infinite ease-out;
     flex-shrink: 0;
   }
-  .dot.loading {
-    background: var(--yellow);
-    box-shadow: 0 0 8px var(--yellow);
-    animation: pulseDot 0.9s infinite ease-in-out;
-  }
-  @keyframes pulseDot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.45; transform: scale(0.82); }
-  }
-  .bet-summary {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #e2e8f0;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-  .profit-chip {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 7px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.1px;
-  }
-  .profit-chip.pos {
-    background: var(--green-bg);
-    color: var(--green);
-    border: 1px solid rgba(16, 185, 129, 0.35);
-  }
-  .profit-chip.neg {
-    background: var(--red-bg);
-    color: var(--red);
-    border: 1px solid rgba(239, 68, 68, 0.35);
+
+  .pulse-dot.syncing {
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
   }
 
-  /* Custom Date Navigator Pill */
+  @keyframes livePulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+
+  /* Date Navigator */
   .date-nav {
     display: inline-flex;
     align-items: center;
-    background: #111317;
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 11px;
     padding: 3px;
     gap: 2px;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   }
+
   .date-step {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border: none;
     background: transparent;
-    color: var(--text);
-    border-radius: 7px;
-    font-size: 15px;
+    color: var(--text-sec);
+    border-radius: 8px;
+    font-size: 16px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     font-family: inherit;
-    transition: background 0.15s ease, opacity 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
   }
-  .date-step:active {
-    background: rgba(255, 255, 255, 0.08);
+
+  .date-step:hover:not(.disabled) {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
   }
+
   .date-step.disabled {
-    opacity: 0.25;
+    opacity: 0.22;
     pointer-events: none;
   }
+
   .date-trigger {
     border: none;
-    background: #1b1f27;
+    background: var(--surface-hover);
     color: var(--text);
-    border-radius: 7px;
-    padding: 5px 10px;
-    font-size: 12px;
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-size: 12.5px;
     font-weight: 600;
     font-family: inherit;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    transition: background 0.15s ease;
   }
+
+  .date-trigger:hover {
+    background: #1d212d;
+  }
+
   .date-trigger .chev {
     font-size: 10px;
-    color: var(--muted);
+    color: var(--text-muted);
     transition: transform 0.18s ease;
   }
+
   .date-trigger.open .chev {
     transform: rotate(180deg);
   }
 
-  /* Custom Calendar Date Picker Popover */
+  /* Calendar Popover */
   .date-dropdown {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 8px);
     right: 0;
-    width: 288px;
-    background: #13161c;
-    border: 1px solid rgba(255, 255, 255, 0.11);
-    border-radius: 14px;
-    padding: 12px 11px 11px;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.75);
-    z-index: 50;
+    width: 292px;
+    background: #131620;
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    padding: 13px 12px 12px;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.72);
+    z-index: 60;
     display: none;
-    backdrop-filter: blur(16px);
   }
+
   .date-dropdown.show {
     display: block;
   }
+
   .cal-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 9px;
-    padding: 0 2px;
+    margin-bottom: 10px;
+    padding: 0 4px;
   }
-  .cal-month-wrap {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
+
   .cal-month {
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text);
   }
+
+  .cal-net-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-variant-numeric: tabular-nums;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-sec);
+  }
+
+  .cal-net-pill.pos {
+    background: var(--green-soft);
+    color: var(--green-bright);
+  }
+
+  .cal-net-pill.neg {
+    background: var(--red-soft);
+    color: var(--red-bright);
+  }
+
   .cal-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     text-align: center;
     font-size: 10.5px;
     font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
   }
+
   .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 4px;
   }
+
   .cal-day {
     min-height: 38px;
     border: 1px solid transparent;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.03);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.025);
     color: var(--text);
     font-size: 11.5px;
     font-weight: 600;
@@ -256,836 +291,902 @@
     gap: 1px;
     padding: 3px 1px;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.14s ease;
   }
-  .cal-day-num {
-    line-height: 1.1;
-  }
-  .cal-day-pnl {
-    font-size: 8.5px;
-    font-weight: 700;
-    letter-spacing: -0.25px;
-    line-height: 1.05;
-  }
-  .cal-day.pnl-pos {
-    background: rgba(16, 185, 129, 0.16);
-    border-color: rgba(16, 185, 129, 0.42);
-    color: #ecfdf5;
-  }
-  .cal-day.pnl-pos .cal-day-pnl {
-    color: #34d399;
-  }
-  .cal-day.pnl-neg {
-    background: rgba(239, 68, 68, 0.16);
-    border-color: rgba(239, 68, 68, 0.42);
-    color: #fef2f2;
-  }
-  .cal-day.pnl-neg .cal-day-pnl {
-    color: #f87171;
-  }
-  .cal-day.pnl-flat .cal-day-pnl {
-    color: var(--muted);
-  }
-  .cal-day.pnl-snipe {
-    background: rgba(56, 189, 248, 0.14);
-    border-color: rgba(56, 189, 248, 0.44);
-    color: #e0f2fe;
-  }
-  .cal-day.pnl-snipe .cal-day-pnl {
-    color: #38bdf8;
-    letter-spacing: -0.35px;
-  }
-  .cal-day.active.pnl-snipe {
-    background: rgba(56, 189, 248, 0.26);
-    border-color: #38bdf8;
-  }
-  .profit-chip.snipe {
-    background: rgba(56, 189, 248, 0.14);
-    color: #38bdf8;
-    border: 1px solid rgba(56, 189, 248, 0.38);
-  }
-  .cal-day:hover:not(.disabled) {
-    filter: brightness(1.15);
-  }
+
   .cal-day.disabled {
     background: transparent;
     color: rgba(255, 255, 255, 0.16);
     pointer-events: none;
-    cursor: default;
   }
-  .cal-day.active {
-    box-shadow: 0 0 0 2px #f8fafc, 0 0 12px rgba(255, 255, 255, 0.28);
+
+  .cal-day:hover:not(.disabled) {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .cal-day-pnl {
+    font-size: 8.5px;
     font-weight: 700;
-  }
-  .cal-day.active.pnl-pos {
-    background: rgba(16, 185, 129, 0.28);
-    border-color: #10b981;
-  }
-  .cal-day.active.pnl-neg {
-    background: rgba(239, 68, 68, 0.28);
-    border-color: #ef4444;
+    color: var(--text-muted);
   }
 
-  /* Skeleton Loading Cards */
-  .skeleton-card {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 14px 15px;
-    overflow: hidden;
-    position: relative;
-  }
-  .skel-line {
-    height: 12px;
-    border-radius: 6px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.25s infinite linear;
-  }
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+  .cal-day.pnl-pos {
+    background: var(--green-soft);
+    border-color: var(--green-border);
   }
 
-  /* Segmented Control (Singles vs Parlays - Always 1 Row) */
-  .tabs {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    background: #111317;
-    padding: 4px;
-    border-radius: 12px;
-    border: 1px solid var(--card-border);
-    margin-bottom: 10px;
-    position: sticky;
-    top: 10px;
-    z-index: 20;
-    backdrop-filter: blur(12px);
+  .cal-day.pnl-pos .cal-day-pnl {
+    color: var(--green-bright);
   }
-  .tab {
-    background: transparent;
-    color: var(--muted);
-    border: none;
-    padding: 8px 0;
-    border-radius: 9px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.15s ease;
+
+  .cal-day.pnl-neg {
+    background: var(--red-soft);
+    border-color: var(--red-border);
+  }
+
+  .cal-day.pnl-neg .cal-day-pnl {
+    color: var(--red-bright);
+  }
+
+  .cal-day.pnl-today {
+    background: var(--sky-soft);
+    border-color: var(--sky-border);
+  }
+
+  .cal-day.pnl-today .cal-day-pnl {
+    color: var(--sky);
+  }
+
+  .cal-day.active {
+    box-shadow: 0 0 0 2px #f8fafc;
+  }
+
+  /* Scoreboard Hero Card */
+  .scoreboard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px 20px 18px;
+    margin-bottom: 22px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  .sb-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .sb-profit-block {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 2px;
+    gap: 6px;
   }
-  .tab-sub {
+
+  .sb-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  .sb-hero-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .sb-hero-usd {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .sb-hero-usd.pos { color: var(--green-bright); }
+  .sb-hero-usd.neg { color: var(--red-bright); }
+
+  .sb-unit-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-sec);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .sb-unit-pill.pos {
+    background: var(--green-soft);
+    color: var(--green-bright);
+    border-color: var(--green-border);
+  }
+
+  .sb-unit-pill.neg {
+    background: var(--red-soft);
+    color: var(--red-bright);
+    border-color: var(--red-border);
+  }
+
+  .sb-wallet-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    background: var(--inset);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 8px 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sb-wallet-lbl {
     font-size: 10.5px;
     font-weight: 500;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-  }
-  .tab.active {
-    background: #1e222a;
-    color: var(--text);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-  }
-  .tab.active .tab-sub {
-    color: #94a3b8;
-  }
-  .tab-sub.sub-neg, .tab.active .tab-sub.sub-neg {
-    color: #f87171;
-    font-weight: 600;
-  }
-  .tab-sub.sub-pos, .tab.active .tab-sub.sub-pos {
-    color: #34d399;
-    font-weight: 600;
+    color: var(--text-muted);
   }
 
-  /* Sub-Filter Pill Strip (Morning/Main Card or Parlay 1/2/3 - Always 1 Row) */
-  .sort-bar {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 14px;
-    overflow-x: auto;
-  }
-  .sort-pill {
-    flex: 1;
-    background: #111317;
-    color: var(--muted);
-    border: 1px solid var(--card-border);
-    border-radius: 9px;
-    padding: 7px 10px;
-    font-size: 12px;
+  .sb-wallet-val {
+    font-size: 13px;
     font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    white-space: nowrap;
-    text-align: center;
-    transition: all 0.15s ease;
+    color: var(--text);
+  }
+
+  .sb-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 16px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (min-width: 480px) {
+    .sb-stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+  }
+
+  .sb-stat {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1px;
-  }
-  .sort-pill-sub {
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-  }
-  .sort-pill.active {
-    background: #1c222d;
-    color: var(--text);
-    border-color: rgba(56, 189, 248, 0.52);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
-  }
-  .sort-pill.active .sort-pill-sub {
-    color: #93c5fd;
-  }
-  .sort-pill.pill-won {
-    background: rgba(16, 185, 129, 0.08);
-    border-color: rgba(16, 185, 129, 0.35);
-    color: #d1fae5;
-  }
-  .sort-pill.pill-won .sort-pill-sub {
-    color: #34d399;
-    font-weight: 600;
-  }
-  .sort-pill.pill-won.active {
-    background: rgba(16, 185, 129, 0.20);
-    color: #fff;
-    border-color: #10b981;
-    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.20);
-  }
-  .sort-pill.pill-won.active .sort-pill-sub {
-    color: #6ee7b7;
-  }
-  .sort-pill.pill-lost {
-    background: rgba(239, 68, 68, 0.09);
-    border-color: rgba(239, 68, 68, 0.38);
-    color: #fecaca;
-  }
-  .sort-pill.pill-lost .sort-pill-sub {
-    color: #f87171;
-    font-weight: 600;
-  }
-  .sort-pill.pill-lost.active {
-    background: rgba(239, 68, 68, 0.22);
-    color: #fff;
-    border-color: #ef4444;
-    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.24);
-  }
-  .sort-pill.pill-lost.active .sort-pill-sub {
-    color: #fca5a5;
-  }
-  .sort-pill-sub.sub-neg, .sort-pill.active .sort-pill-sub.sub-neg {
-    color: #f87171;
-  }
-  .sort-pill-sub.sub-pos, .sort-pill.active .sort-pill-sub.sub-pos {
-    color: #34d399;
+    gap: 3px;
   }
 
-  /* Parlay Ticket Status Banner */
-  .parlay-banner {
+  .sb-stat-lbl {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .sb-stat-val {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    min-height: 22px;
+    display: flex;
+    align-items: center;
+  }
+
+  .sb-stat-val.pos { color: var(--green-bright); }
+  .sb-stat-val.neg { color: var(--red-bright); }
+  .sb-stat-val.muted { color: var(--text-muted); font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; }
+
+  .sb-stat-sub {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Day Toolbar & Filter Segmented Control */
+  .day-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 11px 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .day-heading {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--text);
+  }
+
+  .filter-seg {
+    display: inline-flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .seg-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-sec);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.14s ease;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .seg-btn:hover {
+    color: var(--text);
+  }
+
+  .seg-btn.active {
+    background: #1d212d;
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .seg-cnt {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .seg-btn.active .seg-cnt {
+    color: var(--text-sec);
+  }
+
+  /* Section Dividers */
+  .section-group {
+    margin-bottom: 20px;
+  }
+
+  .section-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 0 2px;
+  }
+
+  .section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-sec);
+  }
+
+  .section-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .section-dot.ready { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .section-dot.placed { background: var(--sky); }
+  .section-dot.watch { background: var(--amber); }
+
+  .section-meta {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .quiet-notice {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.09);
     border-radius: 12px;
-    border: 1px solid var(--card-border);
-    background: #13171f;
+    padding: 11px 14px;
+    margin-bottom: 18px;
+    font-size: 12.5px;
+    color: var(--text-sec);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
   }
-  .parlay-banner.lost {
-    background: rgba(239, 68, 68, 0.13);
-    border-color: rgba(239, 68, 68, 0.45);
-  }
-  .parlay-banner.won {
-    background: rgba(16, 185, 129, 0.13);
-    border-color: rgba(16, 185, 129, 0.45);
-  }
-  .parlay-banner.open {
-    background: rgba(56, 189, 248, 0.08);
-    border-color: rgba(56, 189, 248, 0.30);
-  }
-  .pb-left {
+
+  /* Bet Cards */
+  .cards-stack {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 12px;
+  }
+
+  .bet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 17px;
+    transition: border-color 0.18s ease, transform 0.18s ease;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .bet-card.stage-READY {
+    border-color: rgba(16, 185, 129, 0.42);
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.12), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .bet-card.card-won {
+    border-color: rgba(16, 185, 129, 0.38);
+  }
+
+  .bet-card.card-lost {
+    border-color: rgba(244, 63, 94, 0.32);
+  }
+
+  /* Card Top Meta */
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .meta-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     min-width: 0;
   }
-  .pb-title {
-    font-size: 13px;
+
+  .sport-pill {
+    font-size: 10.5px;
     font-weight: 700;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 2.5px 7px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #cbd5e1;
+    flex-shrink: 0;
   }
-  .parlay-banner.lost .pb-title {
-    color: #fee2e2;
-  }
-  .parlay-banner.won .pb-title {
-    color: #ecfdf5;
-  }
-  .pb-sub {
-    font-size: 11px;
+
+  .matchup-txt {
+    font-size: 12.5px;
     font-weight: 500;
-    color: #94a3b8;
-    font-variant-numeric: tabular-nums;
+    color: var(--text-sec);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .pb-badge {
-    font-size: 11px;
+
+  .time-txt {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .time-txt.is-live {
+    color: var(--green-bright);
+    font-weight: 600;
+  }
+
+  /* Card Main Pick Row */
+  .card-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .pick-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .pick-headline {
+    font-size: 18px;
     font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.25;
+  }
+
+  .pick-sub {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .status-badge {
+    font-size: 11.5px;
+    font-weight: 600;
     padding: 4px 10px;
     border-radius: 99px;
     white-space: nowrap;
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
   }
-  .pb-badge.lost {
-    background: rgba(239, 68, 68, 0.22);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.45);
-  }
-  .pb-badge.won {
-    background: rgba(16, 185, 129, 0.22);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.45);
-  }
-  .pb-badge.open {
-    background: rgba(56, 189, 248, 0.16);
-    color: #7dd3fc;
-    border: 1px solid rgba(56, 189, 248, 0.35);
+
+  .badge-watch {
+    background: var(--amber-soft);
+    color: var(--amber-bright);
+    border: 1px solid var(--amber-border);
   }
 
-  /* Paper Trade Tag */
-  .paper-badge {
-    display: inline-flex;
-    align-items: center;
-    font-size: 9.5px;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    padding: 2px 6px;
-    border-radius: 5px;
-    background: rgba(245, 158, 11, 0.15);
-    color: #fbbf24;
-    border: 1px solid rgba(245, 158, 11, 0.35);
-    margin-left: 6px;
-    vertical-align: middle;
+  .badge-ready {
+    background: var(--green-soft);
+    color: var(--green-bright);
+    border: 1px solid var(--green-border);
   }
 
-  /* Leg Cards */
-  .legs-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .leg-card {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 13px 15px 14px;
-    transition: border-color 0.2s ease, opacity 0.2s ease;
-  }
-  .leg-card.status-hit {
-    border-color: rgba(16, 185, 129, 0.45);
-  }
-  .leg-card.status-yellow {
-    border-color: rgba(245, 158, 11, 0.42);
-  }
-  .leg-card.status-red {
-    border-color: rgba(239, 68, 68, 0.35);
-  }
-  .leg-card.status-pre {
-    background: #101318;
-    border-color: rgba(255, 255, 255, 0.08);
-    opacity: 0.96;
+  .badge-placed {
+    background: var(--sky-soft);
+    color: var(--sky);
+    border: 1px solid var(--sky-border);
   }
 
-  /* Clear Score + Quarter/Period Strip */
-  .game-strip {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .score-box {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #fff;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.1px;
-  }
-  .live-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 6px var(--green);
-  }
-  .clock-badge {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: #e2e8f0;
-    background: rgba(255, 255, 255, 0.07);
-    padding: 3px 9px;
-    border-radius: 6px;
-    font-variant-numeric: tabular-nums;
+  .badge-won {
+    background: var(--green-soft);
+    color: var(--green-bright);
+    border: 1px solid var(--green-border);
   }
 
-  .row-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 6px;
+  .badge-lost {
+    background: var(--red-soft);
+    color: var(--red-bright);
+    border: 1px solid var(--red-border);
   }
-  .player-block {
+
+  .badge-neutral {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-sec);
+    border: 1px solid var(--border);
+  }
+
+  /* 3-Column Ticket Strip: Odds / Stake / To Win */
+  .ticket-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--inset);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .t-col {
+    padding: 11px 12px;
     display: flex;
     flex-direction: column;
     gap: 3px;
     min-width: 0;
   }
-  .player-name {
-    font-size: 14.5px;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: -0.2px;
-    line-height: 1.25;
-  }
-  .team-line {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .team-tag {
-    font-size: 12px;
-    font-weight: 500;
-    color: #94a3b8;
-  }
-  .pill {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 9px;
-    border-radius: 99px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .pill-hit, .pill-green {
-    background: var(--green-bg);
-    color: var(--green);
-  }
-  .pill-yellow {
-    background: var(--yellow-bg);
-    color: var(--yellow);
-  }
-  .pill-red {
-    background: var(--red-bg);
-    color: var(--red);
-  }
-  .pill-pre {
-    background: var(--pre-bg);
-    color: #94a3b8;
+
+  .t-col + .t-col {
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  .row-mid {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-  .prop-name {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #cbd5e1;
-  }
-  .stat-nums {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
-  /* Slider Track + Live Number Circle Knob */
-  .bar-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 6px 0 4px;
-  }
-  .bar-track {
-    position: relative;
-    flex: 1;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 99px;
-  }
-  .bar-fill {
-    height: 100%;
-    border-radius: 99px;
-    transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .fill-hit, .fill-green { background: var(--green); }
-  .fill-yellow { background: var(--yellow); }
-  .fill-red { background: var(--red); }
-  .fill-pre { background: #262b33; }
-
-  .bar-knob {
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    min-width: 26px;
-    height: 26px;
-    padding: 0 7px;
-    border-radius: 999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11.5px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: #fff;
-    background: #1c2026;
-    border: 2px solid #475569;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
-    transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s, background 0.2s;
-    z-index: 2;
-  }
-  .knob-hit {
-    background: var(--green);
-    border-color: #34d399;
-    color: #052e1f;
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.55);
-  }
-  .knob-green {
-    background: #112621;
-    border-color: var(--green);
-    color: #ecfdf5;
-  }
-  .knob-yellow {
-    background: #292011;
-    border-color: var(--yellow);
-    color: #fef3c7;
-  }
-  .knob-red {
-    background: #2a1416;
-    border-color: var(--red);
-    color: #fee2e2;
-  }
-  .knob-pre {
-    background: #14171c;
-    border-color: #262b33;
-    color: #64748b;
-  }
-  .bar-target {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-    min-width: 24px;
-    text-align: right;
-  }
-  .bar-target.target-hit {
-    color: var(--green);
-  }
-  .empty-state {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    padding: 26px 18px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.5;
-  }
-  .empty-state strong {
-    display: block;
-    color: var(--text);
-    font-size: 14.5px;
-    margin-bottom: 6px;
-  }
-
-  /* Phase-2 Uncapped Compounding & Sharp Pinnacle 24/7 Singles Sniper UI */
-  .sniper-hero {
-    background: linear-gradient(160deg, rgba(16, 24, 36, 0.96), rgba(13, 17, 24, 0.99));
-    border: 1px solid rgba(56, 189, 248, 0.32);
-    border-radius: 15px;
-    padding: 15px 15px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 11px;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
-  }
-  .sh-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .sh-tag {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    color: #38bdf8;
-    background: rgba(56, 189, 248, 0.14);
-    border: 1px solid rgba(56, 189, 248, 0.36);
-    padding: 3.5px 9px;
-    border-radius: 99px;
-  }
-  .sh-wallet-pill {
-    font-size: 11px;
-    font-weight: 700;
-    color: #34d399;
-    background: rgba(16, 185, 129, 0.13);
-    border: 1px solid rgba(16, 185, 129, 0.36);
-    padding: 3.5px 9px;
-    border-radius: 99px;
-    font-variant-numeric: tabular-nums;
-  }
-  .sh-title {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #f8fafc;
-    line-height: 1.32;
-  }
-  .sh-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-  @media (min-width: 520px) {
-    .sh-grid {
-      grid-template-columns: repeat(4, 1fr);
+  @media (min-width: 500px) {
+    .t-col {
+      padding: 12px 15px;
     }
   }
-  .sh-stat {
-    background: rgba(255, 255, 255, 0.038);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 10px;
-    padding: 8px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .sh-stat-lbl {
+
+  .t-lbl {
     font-size: 10px;
     font-weight: 600;
-    color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.25px;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    white-space: nowrap;
   }
-  .sh-stat-val {
-    font-size: 13px;
+
+  .t-val {
+    font-size: 16.5px;
     font-weight: 700;
-    color: #f1f5f9;
+    letter-spacing: -0.02em;
+    color: var(--text);
     font-variant-numeric: tabular-nums;
-  }
-  .sh-stat-val.pos { color: #34d399; }
-  .sh-stat-val.sky { color: #7dd3fc; }
-  .sh-progress-box {
-    background: rgba(16, 185, 129, 0.07);
-    border: 1px solid rgba(16, 185, 129, 0.24);
-    border-radius: 10px;
-    padding: 9px 11px;
+    line-height: 1.2;
     display: flex;
-    flex-direction: column;
-    gap: 6px;
+    align-items: baseline;
+    gap: 5px;
+    flex-wrap: wrap;
   }
-  .sh-prog-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
+
+  .t-val .dec-inline {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0;
+  }
+
+  .t-val.pos { color: var(--green-bright); }
+  .t-val.neg { color: var(--red-bright); }
+
+  .t-sub {
     font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-sec);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+  }
+
+  @media (max-width: 440px) {
+    .hide-xs {
+      display: none;
+    }
+  }
+
+  .t-sub .edge-tag {
+    color: var(--green-bright);
     font-weight: 600;
-    color: #d1fae5;
-    font-variant-numeric: tabular-nums;
   }
-  .sh-prog-top strong {
-    color: #34d399;
+
+  .t-sub .unit-strong {
+    color: #cbd5e1;
+    font-weight: 600;
   }
-  .sh-prog-track {
-    width: 100%;
-    height: 7px;
-    background: rgba(255, 255, 255, 0.09);
-    border-radius: 99px;
-    overflow: hidden;
+
+  .t-sub .unit-pos {
+    color: #6ee7b7;
+    font-weight: 600;
   }
-  .sh-prog-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #10b981, #38bdf8);
-    border-radius: 99px;
-    transition: width 0.4s ease;
+
+  .t-sub .unit-neg {
+    color: #fda4af;
+    font-weight: 600;
   }
-  .sh-prog-note {
-    font-size: 11px;
-    line-height: 1.4;
-    color: #a7f3d0;
-  }
-  .sh-roadmap {
-    background: rgba(56, 189, 248, 0.07);
-    border: 1px solid rgba(56, 189, 248, 0.22);
+
+  /* Live / Post Game Tracker Strip (Hidden Pre-Game) */
+  .live-tracker {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 8px 10px;
-    font-size: 11px;
-    line-height: 1.44;
-    color: #e0f2fe;
-  }
-  .sh-roadmap strong {
-    color: #7dd3fc;
-  }
-  .sh-foot {
-    font-size: 10.5px;
-    color: var(--muted);
-    line-height: 1.38;
-    font-variant-numeric: tabular-nums;
-  }
-  .sniper-strip {
-    margin-top: 11px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
     display: flex;
     flex-direction: column;
     gap: 7px;
   }
-  .sniper-gate-banner {
+
+  .lt-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 6px 9px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1.35;
+    font-size: 12.5px;
     font-variant-numeric: tabular-nums;
   }
-  .sniper-gate-banner.gate-fire {
-    background: rgba(16, 185, 129, 0.14);
-    border: 1px solid rgba(16, 185, 129, 0.38);
-    color: #6ee7b7;
+
+  .lt-score {
+    font-weight: 600;
+    color: var(--text);
   }
-  .sniper-gate-banner.gate-wait {
-    background: rgba(245, 158, 11, 0.13);
-    border: 1px solid rgba(245, 158, 11, 0.36);
-    color: #fde68a;
+
+  .lt-detail {
+    font-weight: 500;
+    color: var(--text-sec);
   }
-  .sniper-chips {
+
+  .lt-bar-track {
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .lt-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  .lt-bar-fill.green, .lt-bar-fill.hit { background: var(--green); }
+  .lt-bar-fill.yellow { background: var(--amber); }
+  .lt-bar-fill.red { background: var(--red); }
+
+  /* Plain-English Watchlist / Ready Explanation Box */
+  .why-box {
+    margin-top: 12px;
+    padding: 11px 13px;
+    border-radius: 11px;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 5px;
   }
-  .s-chip {
-    font-size: 10.5px;
+
+  .why-box.watch {
+    background: rgba(245, 158, 11, 0.065);
+    border: 1px solid rgba(245, 158, 11, 0.20);
+  }
+
+  .why-box.ready {
+    background: rgba(16, 185, 129, 0.075);
+    border: 1px solid rgba(16, 185, 129, 0.24);
+  }
+
+  .why-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .why-title {
+    font-size: 12px;
     font-weight: 600;
-    padding: 2.5px 7.5px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.05);
+    color: #fde68a;
+  }
+
+  .why-box.ready .why-title {
+    color: #6ee7b7;
+  }
+
+  .countdown-pill {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--amber-bright);
+    background: rgba(245, 158, 11, 0.14);
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .why-body {
+    font-size: 12.5px;
+    line-height: 1.48;
     color: #cbd5e1;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .line-check-foot {
+    margin-top: 10px;
+    padding-top: 9px;
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
+    font-size: 11.5px;
+    color: var(--text-muted);
     font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
   }
-  .s-chip.ev {
-    background: rgba(16, 185, 129, 0.13);
-    color: #34d399;
-    border-color: rgba(16, 185, 129, 0.34);
-    font-weight: 700;
+
+  .why-box .line-check-foot {
+    margin-top: 5px;
+    padding-top: 7px;
   }
-  .s-chip.pinn {
-    background: rgba(56, 189, 248, 0.12);
-    color: #7dd3fc;
-    border-color: rgba(56, 189, 248, 0.30);
+
+  /* Empty State & Skeletons */
+  .empty-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 22px;
+    text-align: center;
   }
-  .s-chip.steam {
-    background: rgba(245, 158, 11, 0.15);
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.38);
-    font-weight: 700;
+
+  .empty-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
   }
-  .sniper-slip-note {
-    font-size: 10.5px;
-    color: #94a3b8;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.35;
+
+  .empty-sub {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  .skel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+
+  .skel-bar {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 200% 100%;
+    animation: skelShimmer 1.3s infinite linear;
+  }
+
+  @keyframes skelShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="header">
-    <div class="header-left">
-      <div class="sync-status">
-        <div class="dot loading" id="sync-dot"></div>
-        <span id="sync-text">Loading...</span>
+  <!-- Top Header -->
+  <header class="topbar">
+    <div class="brand-col">
+      <div class="brand-row">
+        <h1 class="brand-title">Singles Tracker</h1>
       </div>
-      <div class="bet-summary" id="bet-summary">Loading Card...</div>
+      <div class="engine-status">
+        <span class="pulse-dot syncing" id="sync-dot"></span>
+        <span id="engine-status-text">Connecting to live scanner...</span>
+      </div>
     </div>
 
     <div class="date-nav">
-      <button class="date-step" id="date-prev" onclick="stepDate(-1)" aria-label="Previous day">‹</button>
+      <button class="date-step" id="date-prev" onclick="stepDate(-1)" aria-label="Previous day">&#8249;</button>
       <button class="date-trigger" id="date-trigger" onclick="toggleDateMenu(event)">
         <span id="date-label">Sat, Nov 14</span>
-        <span class="chev">▾</span>
+        <span class="chev">&#9662;</span>
       </button>
-      <button class="date-step" id="date-next" onclick="stepDate(1)" aria-label="Next day">›</button>
+      <button class="date-step" id="date-next" onclick="stepDate(1)" aria-label="Next day">&#8250;</button>
     </div>
 
     <div class="date-dropdown" id="date-dropdown">
       <div class="cal-top">
-        <button class="date-step disabled" aria-label="Previous month">‹</button>
-        <div class="cal-month-wrap">
-          <span class="cal-month">Nov 2026</span>
-          <span class="profit-chip pos" id="cal-total-chip">+$0.00 Fresh Start</span>
-        </div>
-        <button class="date-step disabled" aria-label="Next month">›</button>
+        <span class="cal-month">November 2026</span>
+        <span class="cal-net-pill" id="cal-total-chip">$0.00</span>
       </div>
       <div class="cal-weekdays">
         <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
       </div>
       <div class="cal-grid" id="cal-grid"></div>
     </div>
+  </header>
+
+  <!-- Clean Performance Scoreboard -->
+  <section class="scoreboard" id="scoreboard">
+    <div class="sb-top">
+      <div class="sb-profit-block">
+        <span class="sb-eyebrow">Total Profit (1u = $15)</span>
+        <div class="sb-hero-row">
+          <span class="sb-hero-usd" id="sb-total-usd">$0.00</span>
+          <span class="sb-unit-pill" id="sb-total-units">0.00u</span>
+        </div>
+      </div>
+      <div class="sb-wallet-badge">
+        <span class="sb-wallet-lbl">Available Balance</span>
+        <span class="sb-wallet-val" id="sb-wallet-val">$215.09 (14.3u)</span>
+      </div>
+    </div>
+
+    <div class="sb-stats-grid">
+      <div class="sb-stat">
+        <span class="sb-stat-lbl">Record</span>
+        <span class="sb-stat-val" id="sb-record">0 - 0</span>
+        <span class="sb-stat-sub" id="sb-record-sub">Wins - Losses</span>
+      </div>
+      <div class="sb-stat">
+        <span class="sb-stat-lbl">Win Rate</span>
+        <span class="sb-stat-val muted" id="sb-winrate">Pending</span>
+        <span class="sb-stat-sub" id="sb-winrate-sub">No settled bets</span>
+      </div>
+      <div class="sb-stat">
+        <span class="sb-stat-lbl">ROI</span>
+        <span class="sb-stat-val muted" id="sb-roi">Pending</span>
+        <span class="sb-stat-sub" id="sb-roi-sub">$0.00 settled</span>
+      </div>
+      <div class="sb-stat">
+        <span class="sb-stat-lbl">Selected Day</span>
+        <span class="sb-stat-val" id="sb-day-net">$0.00</span>
+        <span class="sb-stat-sub" id="sb-day-sub">0 placed / 0 watch</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Day Filter & Cards -->
+  <div class="day-toolbar">
+    <h2 class="day-heading" id="day-heading">Saturday, Nov 14</h2>
+    <div class="filter-seg" id="filter-seg">
+      <button class="seg-btn active" onclick="setFilter('all')">All <span class="seg-cnt" id="cnt-all">0</span></button>
+      <button class="seg-btn" onclick="setFilter('placed')">Placed <span class="seg-cnt" id="cnt-placed">0</span></button>
+      <button class="seg-btn" onclick="setFilter('watchlist')">Watchlist <span class="seg-cnt" id="cnt-watch">0</span></button>
+    </div>
   </div>
 
-  <!-- Optional Sub-Filter Pill Strip when multiple singles windows exist -->
-  <div class="sort-bar" id="sub-pills" style="display: none;"></div>
-
-  <div id="content" class="legs-list"></div>
+  <main id="content"></main>
 </div>
 
 <script>
-let activeCategory = 'singles';
-let activeTab = 'P3';
-let activeDate = '2026-11-14';
+function getInitialEstDate() {
+  try {
+    const est = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    if (est >= '2026-11-14') return est;
+  } catch (e) {}
+  return '2026-11-14';
+}
+
+let activeDate = getInitialEstDate();
+let activeFilter = 'all';
 let dataStore = null;
 const dateCache = {};
 let prefetchedAll = false;
 let fetchSeq = 0;
+let clockSkewMs = 0;
+let usedStaticSource = location.hostname.endsWith('github.io');
 
 const DATE_LABELS = {
   '2026-11-14': 'Sat, Nov 14',
 };
-const STAKE_MAP = { P3: '24/7 Singles Sniper' };
-const PROFIT_MAP = { P3: '+$0.00' };
+
+const DATE_FULL_LABELS = {
+  '2026-11-14': 'Saturday, Nov 14',
+};
+
+function fmtSignedUsd(val) {
+  const n = Number(val || 0);
+  if (Math.abs(n) < 0.005) return '$0.00';
+  return (n > 0 ? '+$' : '-$') + Math.abs(n).toFixed(2);
+}
+
+function fmtSignedUnits(val) {
+  const n = Number(val || 0);
+  if (Math.abs(n) < 0.005) return '0.00u';
+  return (n > 0 ? '+' : '-') + Math.abs(n).toFixed(2) + 'u';
+}
+
+function decToAmer(decVal) {
+  const d = Number(decVal || 0);
+  if (d >= 2.0) return '+' + Math.round((d - 1.0) * 100);
+  if (d > 1.005) return '-' + Math.round(100 / (d - 1.0));
+  return '-110';
+}
+
+function fmtDurationShort(ms) {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  if (totalSec < 60) return totalSec + 's';
+  const mins = Math.floor(totalSec / 60);
+  const secs = totalSec % 60;
+  if (mins < 60) return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  const remM = mins % 60;
+  return remM > 0 ? `${hrs}h ${remM}m` : `${hrs}h`;
+}
 
 function renderSkeletons() {
-  const container = document.getElementById('content');
-  if (!container) return;
-  container.innerHTML = [1, 2, 3].map(() => `
-    <div class="skeleton-card">
-      <div class="skel-line" style="width: 45%; margin-bottom: 12px;"></div>
-      <div class="skel-line" style="width: 72%; height: 15px; margin-bottom: 10px;"></div>
-      <div class="skel-line" style="width: 55%; height: 12px; margin-bottom: 14px;"></div>
-      <div class="skel-line" style="width: 100%; height: 8px;"></div>
+  const el = document.getElementById('content');
+  if (!el) return;
+  el.innerHTML = [1, 2].map(() => `
+    <div class="skel-card">
+      <div class="skel-bar" style="width: 38%; margin-bottom: 12px;"></div>
+      <div class="skel-bar" style="width: 64%; height: 18px; margin-bottom: 16px;"></div>
+      <div class="skel-bar" style="width: 100%; height: 54px; border-radius: 10px;"></div>
     </div>
   `).join('');
 }
@@ -1108,35 +1209,9 @@ document.addEventListener('click', (e) => {
   }
 });
 
-function isLegSettled(l) {
-  if (!l) return true;
-  if (l.is_void || String(l.badge || '').includes('Void')) return true;
-  if (l.game_state === 'post') return true;
-  if (l.status === 'red' && l.raw_side === 'U') return true;
-  return false;
-}
-
-function getSinglesCardVisualClass(grp) {
-  if (!grp || !Array.isArray(grp.legs) || grp.legs.length === 0) return 'pill-open';
-  const hasOpen = grp.legs.some(l => !isLegSettled(l));
-  const net = Number(grp.net_val || 0);
-  if (!hasOpen && net < -0.005) return 'pill-lost';
-  if (!hasOpen && net > 0.005) return 'pill-won';
-  return 'pill-open';
-}
-
-function getDefaultSinglesTab(payloadObj) {
-  if (!payloadObj || !payloadObj.parlays) return 'P3';
-  const eg = payloadObj.parlays.find(p => p.id === 'EG');
-  const p3 = payloadObj.parlays.find(p => p.id === 'P3');
-  const egOpen = Boolean(eg && Array.isArray(eg.legs) && eg.legs.some(l => !isLegSettled(l)));
-  const egLive = Boolean(eg && Array.isArray(eg.legs) && eg.legs.some(l => l.game_state === 'in' && !isLegSettled(l)));
-  const p3Open = Boolean(p3 && Array.isArray(p3.legs) && p3.legs.some(l => !isLegSettled(l)));
-  if (egLive) return 'EG';
-  if (egOpen && !p3Open) return 'EG';
-  if (p3 && Array.isArray(p3.legs) && p3.legs.length > 0) return 'P3';
-  if (eg && Array.isArray(eg.legs) && eg.legs.length > 0) return 'EG';
-  return 'P3';
+function setFilter(f) {
+  activeFilter = f;
+  render();
 }
 
 function selectDate(dt) {
@@ -1146,21 +1221,12 @@ function selectDate(dt) {
   const tr = document.getElementById('date-trigger');
   if (dd) dd.classList.remove('show');
   if (tr) tr.classList.remove('open');
-  const lblEl = document.getElementById('date-label');
-  if (lblEl && DATE_LABELS[dt]) lblEl.innerText = DATE_LABELS[dt];
   if (dateCache[dt]) {
     dataStore = dateCache[dt];
-    activeTab = getDefaultSinglesTab(dataStore);
-    const st = document.getElementById('sync-text');
-    if (st) st.innerText = dataStore.settled_permanent ? 'Settled Final' : ('Updated ' + dataStore.updated_at);
     render();
-    if (!dataStore.settled_permanent) {
-      fetchLive(false);
-    }
+    if (!dataStore.settled_permanent) fetchLive(false);
     return;
   }
-  const bs = document.getElementById('bet-summary');
-  if (bs) bs.innerText = 'Loading ' + (DATE_LABELS[dt] || dt) + ' Card...';
   renderSkeletons();
   fetchLive(true);
 }
@@ -1176,35 +1242,266 @@ function stepDate(dir) {
   }
 }
 
-function selectSubTab(id) {
-  activeTab = id;
-  render();
+function isLegSettled(l) {
+  if (!l) return true;
+  if (l.is_void || String(l.badge || '').includes('Void') || String(l.badge || '').includes('Push')) return true;
+  if (l.game_state === 'post') return true;
+  if (l.status === 'red' && l.raw_side === 'U') return true;
+  return false;
 }
 
-function sortLegsByRisk(legs) {
-  return [...legs].sort((a, b) => {
-    if ((a.risk_tier ?? 4) !== (b.risk_tier ?? 4)) {
-      return (a.risk_tier ?? 4) - (b.risk_tier ?? 4);
+function updateLiveTickers() {
+  // 1. Update scanner heartbeat status text
+  const stEl = document.getElementById('engine-status-text');
+  if (stEl && dataStore) {
+    const hb = dataStore.engine_heartbeat || {};
+    const intervalMin = Math.max(1, Math.round(Number(hb.scan_interval_sec || 120) / 60));
+    const eventsCnt = Number(hb.pinnacle_events || 0);
+    const gamesSuffix = eventsCnt > 0 ? ` · ${eventsCnt} games monitored` : '';
+    if (usedStaticSource) {
+      const syncTime = hb.last_scan_est || dataStore.updated_at || '';
+      stEl.innerText = `Live scores active · Scans every ${intervalMin}m${syncTime ? ' (Synced ' + syncTime + ')' : ''}`;
+    } else if (hb.last_scan_epoch_ms) {
+      const nowAdj = Date.now() + clockSkewMs;
+      const ageMs = Math.max(0, nowAdj - Number(hb.last_scan_epoch_ms));
+      const ageTxt = ageMs < 5000 ? 'just now' : `${fmtDurationShort(ageMs)} ago`;
+      stEl.innerText = `Checked ${ageTxt} · Scans every ${intervalMin}m${gamesSuffix}`;
+    } else {
+      stEl.innerText = `Scanner active · Scans every ${intervalMin}m`;
     }
-    if (a.game_state === 'in' && b.game_state === 'in') {
-      if ((a.pace_delta ?? 0) !== (b.pace_delta ?? 0)) {
-        return (a.pace_delta ?? 0) - (b.pace_delta ?? 0);
-      }
-      return (a.pct ?? 0) - (b.pct ?? 0);
+  }
+
+  // 2. Update Watchlist countdown pills
+  const pills = document.querySelectorAll('[data-release-ms]');
+  const nowMs = Date.now() + clockSkewMs;
+  pills.forEach(el => {
+    const targetMs = Number(el.getAttribute('data-release-ms') || 0);
+    if (!targetMs) return;
+    const diff = targetMs - nowMs;
+    if (diff <= 0) {
+      el.innerText = 'Checking live line now...';
+    } else {
+      el.innerText = 'Checks in ' + fmtDurationShort(diff);
     }
-    return (a.start_order ?? 2000) - (b.start_order ?? 2000);
   });
+}
+
+function renderBetCard(l) {
+  const stage = l.bet_stage || 'WATCHLIST';
+  const isLive = l.game_state === 'in';
+  const isPost = l.game_state === 'post';
+  const settled = isLegSettled(l);
+
+  const sportTag = l.sport_short || l.raw_sport || 'SPORT';
+  const matchupTxt = l.matchup_clean || (l.team ? String(l.team).split('•').pop().trim() : l.game_score);
+  const headline = l.pick_headline || l.player || 'Single Pick';
+  const marketSub = l.market_subtitle || 'Full Game';
+
+  const effOdds = Number(l.raw_odds || l.sniper_badges?.eff_odds || 1.91);
+  const amerOdds = l.amer_odds || l.sniper_badges?.amer_odds || decToAmer(effOdds);
+  const decStr = l.dec_odds_fmt || (effOdds.toFixed(2) + 'x');
+  const stakeUsd = Number(l.stake ?? 9.0);
+  const stakeUnits = Number(l.stake_units ?? (stakeUsd / 15.0));
+  const payoutUsd = Number(l.exact_payout ?? (stakeUsd * effOdds));
+  const toWinUsd = Number(l.to_win_usd ?? Math.max(0, payoutUsd - stakeUsd));
+  const toWinUnits = Number(l.to_win_units ?? (toWinUsd / 15.0));
+  const edgePct = Number(l.sniper_badges?.net_ev_pct || 0);
+  const fairPct = Number(l.sniper_badges?.pinn_fair_pct || 0);
+  const fairAmer = l.fair_amer_odds || l.sniper_badges?.fair_amer_odds || '';
+
+  // Time / Clock top-right
+  let timeHtml = '';
+  if (isLive) {
+    timeHtml = `<span class="time-txt is-live"><span class="pulse-dot" style="width:6px;height:6px;"></span>${l.game_clock || 'LIVE'}</span>`;
+  } else if (isPost) {
+    timeHtml = `<span class="time-txt">Final</span>`;
+  } else {
+    const cleanStart = String(l.start_label || l.game_clock || 'Scheduled').replace(/^Starts\s+/i, '');
+    timeHtml = `<span class="time-txt">${cleanStart}</span>`;
+  }
+
+  // Status badge & card state class
+  let badgeCls = 'badge-watch';
+  let badgeTxt = 'Watchlist';
+  let cardExtraCls = `stage-${stage}`;
+
+  if (stage === 'WATCHLIST') {
+    badgeCls = 'badge-watch';
+    badgeTxt = l.release_time_est ? `Watchlist · ${l.release_time_est.replace(' EST', '')}` : 'Watchlist';
+  } else if (stage === 'READY') {
+    badgeCls = 'badge-ready';
+    badgeTxt = 'Ready to Bet';
+  } else {
+    if (l.is_void) {
+      badgeCls = 'badge-neutral';
+      badgeTxt = 'Push ($0)';
+    } else if (l.status === 'hit' && settled) {
+      badgeCls = 'badge-won';
+      badgeTxt = `Won +${toWinUnits.toFixed(2)}u`;
+      cardExtraCls += ' card-won';
+    } else if (l.status === 'red' && settled) {
+      badgeCls = 'badge-lost';
+      badgeTxt = `Lost -${stakeUnits.toFixed(2)}u`;
+      cardExtraCls += ' card-lost';
+    } else if (isLive) {
+      badgeCls = l.status === 'green' || l.status === 'hit' ? 'badge-won' : 'badge-watch';
+      badgeTxt = l.badge || 'Live';
+    } else {
+      badgeCls = 'badge-placed';
+      badgeTxt = 'Placed';
+    }
+  }
+
+  // Column 2 & Column 3 labels and values
+  const stakeLabel = stage === 'PLACED' ? 'Risked' : 'Stake';
+  let col3Lbl = 'To Win';
+  let col3Val = `+$${toWinUsd.toFixed(2)}`;
+  let col3ValCls = 'pos';
+  let col3Sub = `<span class="unit-pos">+${toWinUnits.toFixed(2)} units</span><span class="hide-xs"> · $${payoutUsd.toFixed(2)} ret</span>`;
+
+  if (stage === 'PLACED' && settled) {
+    col3Lbl = 'Result';
+    if (l.is_void) {
+      col3Val = '$0.00';
+      col3ValCls = '';
+      col3Sub = '0.00u refunded';
+    } else if (l.status === 'hit') {
+      col3Val = `+$${toWinUsd.toFixed(2)}`;
+      col3ValCls = 'pos';
+      col3Sub = `<span class="unit-pos">+${toWinUnits.toFixed(2)}u won</span>`;
+    } else {
+      col3Val = `-$${stakeUsd.toFixed(2)}`;
+      col3ValCls = 'neg';
+      col3Sub = `<span class="unit-neg">-${stakeUnits.toFixed(2)}u lost</span>`;
+    }
+  }
+
+  // Live or Final score tracker (Hidden pre-game so there is zero clutter)
+  let liveTrackerHtml = '';
+  if (isLive || isPost) {
+    const pctNum = Math.min(100, Math.max(6, Number(l.pct || 50)));
+    const barHtml = isLive ? `
+      <div class="lt-bar-track">
+        <div class="lt-bar-fill ${l.status || 'green'}" style="width: ${pctNum}%"></div>
+      </div>
+    ` : '';
+    liveTrackerHtml = `
+      <div class="live-tracker">
+        <div class="lt-row">
+          <span class="lt-score">${l.game_score || matchupTxt}</span>
+          <span class="lt-detail">${l.sub_stat || ''}</span>
+        </div>
+        ${barHtml}
+      </div>
+    `;
+  }
+
+  // Plain-English explanation box (Watchlist / Ready / Placed)
+  let footerHtml = '';
+  const lineCheckStr = fairPct > 0
+    ? `Overtime ${amerOdds} (${decStr}) vs Sharp fair line ${fairAmer} (${fairPct.toFixed(1)}% win chance)`
+    : `Overtime ${amerOdds} (${decStr})`;
+
+  if (stage === 'WATCHLIST') {
+    const cdAttr = l.release_epoch_ms ? `data-release-ms="${l.release_epoch_ms}"` : '';
+    const cdHtml = l.release_epoch_ms ? `<span class="countdown-pill" ${cdAttr}>Calculating...</span>` : '';
+    footerHtml = `
+      <div class="why-box watch">
+        <div class="why-hdr">
+          <span class="why-title">${l.why_title || 'Why this is on the Watchlist'}</span>
+          ${cdHtml}
+        </div>
+        <p class="why-body">${l.why_body || ''}</p>
+        <div class="line-check-foot">
+          <span>${lineCheckStr}</span>
+        </div>
+      </div>
+    `;
+  } else if (stage === 'READY') {
+    footerHtml = `
+      <div class="why-box ready">
+        <div class="why-hdr">
+          <span class="why-title">${l.why_title || 'Ready to Place Now'}</span>
+        </div>
+        <p class="why-body">${l.why_body || ''}</p>
+        <div class="line-check-foot">
+          <span>${lineCheckStr}</span>
+        </div>
+      </div>
+    `;
+  } else {
+    footerHtml = `
+      <div class="line-check-foot">
+        <span>${lineCheckStr}</span>
+        ${edgePct > 0 ? `<span style="color: var(--green-bright); font-weight: 600;">+${edgePct.toFixed(1)}% edge at entry</span>` : ''}
+      </div>
+    `;
+  }
+
+  const edgeSub = edgePct > 0
+    ? `<span class="edge-tag">+${edgePct.toFixed(1)}% edge</span>`
+    : `Decimal ${decStr}`;
+
+  return `
+    <article class="bet-card ${cardExtraCls}">
+      <div class="card-meta">
+        <div class="meta-left">
+          <span class="sport-pill">${sportTag}</span>
+          <span class="matchup-txt">${matchupTxt}</span>
+        </div>
+        ${timeHtml}
+      </div>
+
+      <div class="card-main">
+        <div class="pick-info">
+          <h3 class="pick-headline">${headline}</h3>
+          <span class="pick-sub">${marketSub}</span>
+        </div>
+        <span class="status-badge ${badgeCls}">${badgeTxt}</span>
+      </div>
+
+      <div class="ticket-grid">
+        <div class="t-col">
+          <span class="t-lbl">Odds</span>
+          <span class="t-val">${amerOdds}<span class="dec-inline">${decStr}</span></span>
+          <span class="t-sub">${edgeSub}</span>
+        </div>
+        <div class="t-col">
+          <span class="t-lbl">${stakeLabel}</span>
+          <span class="t-val">$${stakeUsd.toFixed(2)}</span>
+          <span class="t-sub"><span class="unit-strong">${stakeUnits.toFixed(2)} units</span></span>
+        </div>
+        <div class="t-col">
+          <span class="t-lbl">${col3Lbl}</span>
+          <span class="t-val ${col3ValCls}">${col3Val}</span>
+          <span class="t-sub">${col3Sub}</span>
+        </div>
+      </div>
+
+      ${liveTrackerHtml}
+      ${footerHtml}
+    </article>
+  `;
 }
 
 function render() {
   if (!dataStore) return;
 
-  if (dataStore.available_dates) {
+  // 1. Update Date Selector & Calendar
+  if (Array.isArray(dataStore.available_dates)) {
     const dates = dataStore.available_dates;
     const idx = dates.findIndex(d => d.date === activeDate);
     const curObj = idx >= 0 ? dates[idx] : dates[dates.length - 1];
+    dates.forEach(d => {
+      if (d.short_label) DATE_LABELS[d.date] = d.short_label;
+      if (d.full_label) DATE_FULL_LABELS[d.date] = d.full_label.replace(/,\s*\d{4}$/, '');
+    });
+
     const lblEl = document.getElementById('date-label');
-    if (lblEl && curObj) lblEl.innerText = curObj.short_label;
+    if (lblEl && curObj) lblEl.innerText = curObj.short_label || activeDate;
+    const dayHdr = document.getElementById('day-heading');
+    if (dayHdr) dayHdr.innerText = DATE_FULL_LABELS[activeDate] || DATE_LABELS[activeDate] || activeDate;
+
     const prevBtn = document.getElementById('date-prev');
     const nextBtn = document.getElementById('date-next');
     if (prevBtn) prevBtn.classList.toggle('disabled', idx <= 0);
@@ -1213,281 +1510,244 @@ function render() {
     const gridEl = document.getElementById('cal-grid');
     if (gridEl) {
       const availMap = {};
-      const lockedMap = {};
-      const sniperMap = {};
-      let runningTotal = 0;
+      let calTotal = 0;
       dates.forEach(d => {
-        DATE_LABELS[d.date] = d.short_label || DATE_LABELS[d.date] || d.date;
         const cachedNet = (dateCache[d.date] && dateCache[d.date].day_net !== undefined)
           ? Number(dateCache[d.date].day_net)
           : Number(d.net ?? 0);
         availMap[d.date] = cachedNet;
-        lockedMap[d.date] = Boolean(d.locked);
-        sniperMap[d.date] = Boolean(d.is_vetted_sniper);
-        runningTotal += cachedNet;
+        calTotal += cachedNet;
       });
       const totChip = document.getElementById('cal-total-chip');
       if (totChip) {
-        const tSign = runningTotal >= 0 ? '+' : '-';
-        totChip.className = 'profit-chip ' + (runningTotal >= 0 ? 'pos' : 'neg');
-        totChip.innerText = `${tSign}$${Math.abs(runningTotal).toFixed(2)} Net`;
+        totChip.innerText = fmtSignedUsd(calTotal);
+        totChip.className = 'cal-net-pill' + (calTotal > 0.005 ? ' pos' : (calTotal < -0.005 ? ' neg' : ''));
       }
       let cells = '';
       for (let day = 1; day <= 30; day++) {
         const dtStr = '2026-11-' + String(day).padStart(2, '0');
-        const isAvail = Object.prototype.hasOwnProperty.call(availMap, dtStr);
-        const isActive = dtStr === activeDate;
-        if (!isAvail) {
-          cells += `<button class="cal-day disabled"><span class="cal-day-num">${day}</span></button>`;
+        if (!Object.prototype.hasOwnProperty.call(availMap, dtStr)) {
+          cells += `<button class="cal-day disabled"><span>${day}</span></button>`;
         } else {
           const dNet = Number(availMap[dtStr] || 0);
-          const isLocked = lockedMap[dtStr];
-          const isSniper = sniperMap[dtStr];
-          let pnlCls = 'pnl-flat';
-          let pnlTxt = isLocked ? '$0' : '-';
-          if (isSniper && Math.abs(dNet) < 0.005) {
-            pnlCls = 'pnl-snipe';
-            pnlTxt = 'LIVE';
-          } else if (dNet > 0.005) {
-            pnlCls = 'pnl-pos';
-            pnlTxt = '+$' + Math.round(dNet);
+          const isAct = dtStr === activeDate;
+          let cls = 'cal-day';
+          let sub = '$0';
+          if (dNet > 0.005) {
+            cls += ' pnl-pos';
+            sub = '+$' + Math.round(dNet);
           } else if (dNet < -0.005) {
-            pnlCls = 'pnl-neg';
-            pnlTxt = '-$' + Math.round(Math.abs(dNet));
+            cls += ' pnl-neg';
+            sub = '-$' + Math.round(Math.abs(dNet));
+          } else {
+            cls += ' pnl-today';
+            sub = 'Today';
           }
-          const cls = `cal-day ${pnlCls}${isActive ? ' active' : ''}`;
-          cells += `<button class="${cls}" onclick="selectDate('${dtStr}')"><span class="cal-day-num">${day}</span><span class="cal-day-pnl">${pnlTxt}</span></button>`;
+          if (isAct) cls += ' active';
+          cells += `<button class="${cls}" onclick="selectDate('${dtStr}')"><span>${day}</span><span class="cal-day-pnl">${sub}</span></button>`;
         }
       }
       gridEl.innerHTML = cells;
     }
   }
 
-  const pMap = {};
-  (dataStore.parlays || []).forEach(p => { pMap[p.id] = p; });
-  const isVettedUnwagered = Boolean(dataStore.is_unwagered_vetted_card);
+  // 2. Gather All Legs for Selected Date
+  const allLegs = [];
+  (dataStore.parlays || []).forEach(grp => {
+    (grp.legs || []).forEach(l => allLegs.push(l));
+  });
 
-  const p3Obj = pMap['P3'] || { legs: [], net_val: 0, profit_str: '+$0.00' };
-  const egObj = pMap['EG'];
-  const sLegsTotal = (p3Obj.legs?.length || 0) + (egObj?.legs?.length || 0);
+  const readyLegs = allLegs.filter(l => l.bet_stage === 'READY');
+  const placedLegs = allLegs.filter(l => l.bet_stage === 'PLACED');
+  const watchLegs = allLegs.filter(l => (l.bet_stage || 'WATCHLIST') === 'WATCHLIST');
 
-  if (activeTab === 'EG' && (!egObj || !(egObj.legs || []).length)) activeTab = 'P3';
-  else if (activeTab === 'P3' && !(p3Obj.legs || []).length && egObj && (egObj.legs || []).length) activeTab = 'EG';
-  if (activeTab !== 'P3' && activeTab !== 'EG') activeTab = getDefaultSinglesTab(dataStore);
+  // 3. Update Scoreboard
+  const sb = dataStore.scoreboard || {};
+  const sm = dataStore.sniper_meta || {};
+  const totUsd = Number(sb.total_net_usd ?? dataStore.day_net ?? 0);
+  const totUnits = Number(sb.total_net_units ?? (totUsd / 15.0));
+  const wins = Number(sb.total_wins ?? 0);
+  const losses = Number(sb.total_losses ?? 0);
+  const pushes = Number(sb.total_pushes ?? 0);
+  const settledCnt = wins + losses;
+  const winRate = sb.win_rate_pct;
+  const roiPct = sb.roi_pct;
+  const walletUsd = Number(sb.wallet_balance_usd ?? sm.onchain_usdc_usd ?? 215.09);
+  const walletU = Number(sb.wallet_balance_units ?? sm.onchain_units ?? 14.34);
 
-  // Only show sub-pills if both Morning (EG) and Main (P3) exist
-  const pillsEl = document.getElementById('sub-pills');
-  if (pillsEl) {
-    if (egObj && (egObj.legs || []).length > 0 && (p3Obj.legs || []).length > 0) {
-      pillsEl.style.display = 'flex';
-      const egHits = egObj.legs.filter(l => l.status === 'hit').length;
-      const egVis = getSinglesCardVisualClass(egObj);
-      const mainHits = (p3Obj.legs || []).filter(l => l.status === 'hit').length;
-      const mainVis = getSinglesCardVisualClass(p3Obj);
-      pillsEl.innerHTML = `
-        <button class="sort-pill ${egVis} ${activeTab === 'EG' ? 'active' : ''}" onclick="selectSubTab('EG')">
-          <span>Morning Singles (${egObj.legs.length})</span>
-          <span class="sort-pill-sub">${egObj.profit_str || ''} • ${egHits}/${egObj.legs.length}</span>
-        </button>
-        <button class="sort-pill ${mainVis} ${activeTab === 'P3' ? 'active' : ''}" onclick="selectSubTab('P3')">
-          <span>Main Singles (${(p3Obj.legs || []).length})</span>
-          <span class="sort-pill-sub">${p3Obj.profit_str || ''} • ${mainHits}/${(p3Obj.legs || []).length}</span>
-        </button>
-      `;
+  const elTotUsd = document.getElementById('sb-total-usd');
+  const elTotU = document.getElementById('sb-total-units');
+  if (elTotUsd) {
+    elTotUsd.innerText = fmtSignedUsd(totUsd);
+    elTotUsd.className = 'sb-hero-usd' + (totUsd > 0.005 ? ' pos' : (totUsd < -0.005 ? ' neg' : ''));
+  }
+  if (elTotU) {
+    elTotU.innerText = fmtSignedUnits(totUnits);
+    elTotU.className = 'sb-unit-pill' + (totUnits > 0.005 ? ' pos' : (totUnits < -0.005 ? ' neg' : ''));
+  }
+
+  const elWallet = document.getElementById('sb-wallet-val');
+  if (elWallet) {
+    elWallet.innerText = `$${walletUsd.toFixed(2)} (${walletU.toFixed(1)}u)`;
+  }
+
+  const elRec = document.getElementById('sb-record');
+  const elRecSub = document.getElementById('sb-record-sub');
+  if (elRec) {
+    elRec.innerText = pushes > 0 ? `${wins} - ${losses} - ${pushes}` : `${wins} - ${losses}`;
+  }
+  if (elRecSub) {
+    const openCnt = Number(sb.day_open || 0);
+    elRecSub.innerText = openCnt > 0 ? `${openCnt} in play` : (settledCnt > 0 ? `${settledCnt} settled` : 'Fresh start');
+  }
+
+  const elWr = document.getElementById('sb-winrate');
+  const elWrSub = document.getElementById('sb-winrate-sub');
+  if (elWr) {
+    if (winRate === null || winRate === undefined || settledCnt === 0) {
+      elWr.innerText = 'Pending';
+      elWr.className = 'sb-stat-val muted';
+      if (elWrSub) elWrSub.innerText = 'No settled bets';
     } else {
-      pillsEl.style.display = 'none';
-      pillsEl.innerHTML = '';
+      elWr.innerText = `${Number(winRate).toFixed(1)}%`;
+      elWr.className = 'sb-stat-val' + (Number(winRate) >= 54 ? ' pos' : '');
+      if (elWrSub) elWrSub.innerText = `${wins} of ${settledCnt} won`;
     }
   }
 
+  const elRoi = document.getElementById('sb-roi');
+  const elRoiSub = document.getElementById('sb-roi-sub');
+  if (elRoi) {
+    const settledRisk = Number(sb.total_settled_risk_usd || 0);
+    if (roiPct === null || roiPct === undefined || settledRisk <= 0) {
+      elRoi.innerText = 'Pending';
+      elRoi.className = 'sb-stat-val muted';
+      if (elRoiSub) elRoiSub.innerText = '$0.00 settled';
+    } else {
+      const rNum = Number(roiPct);
+      elRoi.innerText = (rNum >= 0 ? '+' : '') + rNum.toFixed(1) + '%';
+      elRoi.className = 'sb-stat-val' + (rNum > 0.05 ? ' pos' : (rNum < -0.05 ? ' neg' : ''));
+      if (elRoiSub) elRoiSub.innerText = `On $${settledRisk.toFixed(0)} risked`;
+    }
+  }
+
+  const dayUsd = Number(sb.day_net_usd ?? dataStore.day_net ?? 0);
+  const dayU = Number(sb.day_net_units ?? (dayUsd / 15.0));
+  const elDayNet = document.getElementById('sb-day-net');
+  const elDaySub = document.getElementById('sb-day-sub');
+  if (elDayNet) {
+    elDayNet.innerText = placedLegs.length > 0 ? `${fmtSignedUsd(dayUsd)} (${fmtSignedUnits(dayU)})` : '$0.00';
+    elDayNet.className = 'sb-stat-val' + (dayUsd > 0.005 ? ' pos' : (dayUsd < -0.005 ? ' neg' : ''));
+  }
+  if (elDaySub) {
+    const pCnt = placedLegs.length + readyLegs.length;
+    elDaySub.innerText = `${placedLegs.length} placed · ${watchLegs.length} watch`;
+  }
+
+  // 4. Update Filter Pill Counts & Active State
+  const cntAll = document.getElementById('cnt-all');
+  const cntPlaced = document.getElementById('cnt-placed');
+  const cntWatch = document.getElementById('cnt-watch');
+  if (cntAll) cntAll.innerText = String(allLegs.length);
+  if (cntPlaced) cntPlaced.innerText = String(placedLegs.length + readyLegs.length);
+  if (cntWatch) cntWatch.innerText = String(watchLegs.length);
+
+  const btns = document.querySelectorAll('#filter-seg .seg-btn');
+  const filterOrder = ['all', 'placed', 'watchlist'];
+  btns.forEach((b, i) => {
+    b.classList.toggle('active', filterOrder[i] === activeFilter);
+  });
+
+  // 5. Render Cards List
   const container = document.getElementById('content');
-  const activeGroup = pMap[activeTab] || p3Obj;
-  const bs = document.getElementById('bet-summary');
-  if (bs) {
-    const sm = dataStore.sniper_meta || {};
-    const onchainUsd = Number(sm.onchain_usdc_usd || 215.09);
-    const onchainU = Number(sm.onchain_units || 14.34);
-    if (sLegsTotal === 0) {
-      bs.innerHTML = `<span>$${onchainUsd.toFixed(2)} USDC (${onchainU.toFixed(2)}u)</span><span class="profit-chip snipe">Scanning 24/7</span>`;
-    } else if (isVettedUnwagered) {
-      const pRisk = Number(dataStore.paper_risk || 0);
-      const pNet = Number(dataStore.paper_net || 0);
-      const expUsd = Number(sm.expected_profit_usd || 0);
-      const avgEv = Number(sm.avg_net_ev_pct || 0);
-      const anySettled = (p3Obj.legs || []).some(l => isLegSettled(l));
-      if (anySettled || Math.abs(pNet) > 0.005) {
-        const pSign = pNet >= 0 ? '+' : '-';
-        const cCls = pNet >= 0 ? 'pos' : 'neg';
-        bs.innerHTML = `<span>$${onchainUsd.toFixed(2)} Float • $${pRisk.toFixed(2)} Card</span><span class="profit-chip ${cCls}">${pSign}$${Math.abs(pNet).toFixed(2)}</span>`;
-      } else {
-        bs.innerHTML = `<span>$${onchainUsd.toFixed(2)} Float (${onchainU.toFixed(2)}u)</span><span class="profit-chip snipe">${sLegsTotal} Vetted (+${avgEv.toFixed(1)}% EV)</span>`;
-      }
-    } else {
-      const dayRisk = Number(dataStore.day_risk ?? activeGroup?.risk_val ?? 0);
-      const dayNet = Number(dataStore.day_net ?? activeGroup?.net_val ?? 0);
-      const chipCls = dayNet >= 0 ? 'pos' : 'neg';
-      const netSign = dayNet >= 0 ? '+' : '-';
-      bs.innerHTML = `<span>$${dayRisk.toFixed(2)} Staked</span><span class="profit-chip ${chipCls}">${netSign}$${Math.abs(dayNet).toFixed(2)} Net</span>`;
-    }
-  }
+  if (!container) return;
 
-  const rawLegs = (activeGroup && activeGroup.legs) ? activeGroup.legs : [];
-  let bannerHtml = '';
-  if (dataStore.sniper_meta) {
-    const sm = dataStore.sniper_meta;
-    const onchainUsd = Number(sm.onchain_usdc_usd || 215.09);
-    const onchainU = Number(sm.onchain_units || 14.34);
-    const gasUsd = Number(sm.eth_gas_usd || 7.98);
-    const unitUsd = Number(sm.unit_stake_usd || 15.0);
-    const prTarget = Number(sm.principal_target_usd || 750.0);
-    const prPct = Math.min(100, Math.max(0, Number(sm.principal_progress_pct || 28.7)));
-    const fireCnt = Number(sm.fire_now_count || 0);
-    const waitCnt = Number(sm.waiting_t90m_count || 0);
-    bannerHtml = `
-      <div class="sniper-hero">
-        <div class="sh-top">
-          <span class="sh-tag">Overtime V2 + Pinnacle 24/7 Singles Sniper</span>
-          <span class="sh-wallet-pill">$${onchainUsd.toFixed(2)} USDC (${onchainU.toFixed(2)}u) • $${gasUsd.toFixed(2)} ETH Gas</span>
-        </div>
-        <div class="sh-title">24/7 Smart Singles Bot ($${unitUsd.toFixed(0)} Base Bet • $9 to $17 Per Play)</div>
-        <div class="sh-grid">
-          <div class="sh-stat">
-            <span class="sh-stat-lbl">Wallet Balance</span>
-            <span class="sh-stat-val sky">$${onchainUsd.toFixed(2)} (${onchainU.toFixed(2)}u)</span>
-          </div>
-          <div class="sh-stat">
-            <span class="sh-stat-lbl">Base Bet Size</span>
-            <span class="sh-stat-val">$${unitUsd.toFixed(2)} ($9-$17 range)</span>
-          </div>
-          <div class="sh-stat">
-            <span class="sh-stat-lbl">Today's Picks</span>
-            <span class="sh-stat-val">$${Number(sm.working_float_usd || 0).toFixed(2)} (${fireCnt} Ready / ${waitCnt} Watchlist)</span>
-          </div>
-          <div class="sh-stat">
-            <span class="sh-stat-lbl">Expected Profit Edge</span>
-            <span class="sh-stat-val pos">+$${Number(sm.expected_profit_usd || 0).toFixed(2)} (+${Number(sm.avg_net_ev_pct || 0).toFixed(2)}%)</span>
-          </div>
-        </div>
-        <div class="sh-progress-box">
-          <div class="sh-prog-top">
-            <span><strong>Get Your Deposit Back Goal:</strong> $${onchainUsd.toFixed(2)} / $${prTarget.toFixed(0)} Wallet Balance</span>
-            <strong>${prPct.toFixed(1)}%</strong>
-          </div>
-          <div class="sh-prog-track">
-            <div class="sh-prog-fill" style="width: ${prPct}%"></div>
-          </div>
-          <div class="sh-prog-note">
-            Once your wallet reaches <strong>$${prTarget.toFixed(0)}</strong>, cash out 100% of the money you put in and grow pure house profit from there toward $10k -&gt; $25k+.
-          </div>
-        </div>
-        <div class="sh-roadmap">
-          <strong>How the 24/7 Filter Protects Your Cash:</strong> Big sudden price mistakes are grabbed right away 24/7 • Smaller early discounts wait on the Watchlist until 90 mins before game time (after lineups come out, so your cash isn't locked up all day) • Your last $45 is saved strictly for A+ slam-dunk deals.
-        </div>
-        <div class="sh-foot">
-          Scanned ${Number(sm.ot_markets_scanned || 0).toLocaleString()} Overtime lines vs ${Number(sm.pinn_markets_indexed || 0).toLocaleString()} live Pinnacle lines • Filtered out ${Number(sm.hard_blocks_triggered || 0).toLocaleString()} bad/overpriced lines
-        </div>
+  if (allLegs.length === 0) {
+    container.innerHTML = `
+      <div class="empty-box">
+        <div class="empty-title">No Picks or Watchlist Plays Right Now</div>
+        <p class="empty-sub">The scanner checks live Pinnacle vs Overtime odds every 2 minutes across NBA, College Basketball, NHL, Football, Tennis, and Soccer. Plays appear here automatically as soon as an edge shows up.</p>
       </div>
     `;
-  }
-
-  if (rawLegs.length === 0) {
-    container.innerHTML = bannerHtml + `
-      <div class="empty-state">
-        <strong>No Plays Ready Right Now (${DATE_LABELS[activeDate] || activeDate})</strong>
-        Scanning Pinnacle vs Overtime every 2 minutes across NBA, College Basketball, NHL, NFL, College Football, Tennis, and Soccer.
-      </div>
-    `;
+    updateLiveTickers();
     return;
   }
 
-  const sortedLegs = sortLegsByRisk(rawLegs);
+  let html = '';
 
-  container.innerHTML = bannerHtml + sortedLegs.map(l => {
-    const isLive = l.game_state === 'in';
-    const pctNum = l.status === 'pre' ? 0 : Math.min(100, Math.max(0, l.pct));
-    const knobPos = Math.min(96, Math.max(4, pctNum));
-    const rightInfo = l.sub_stat
-      ? l.sub_stat
-      : (l.game_state === 'pre' ? '' : (l.remaining > 0 ? `${l.remaining} to go` : 'Target Hit'));
+  if (activeFilter === 'placed') {
+    const list = [...readyLegs, ...placedLegs];
+    if (list.length === 0) {
+      html = `
+        <div class="empty-box">
+          <div class="empty-title">No Bets Placed Yet on ${DATE_LABELS[activeDate] || activeDate}</div>
+          <p class="empty-sub">${watchLegs.length > 0 ? `We are holding ${watchLegs.length} pick${watchLegs.length === 1 ? '' : 's'} on the Watchlist until closer to start time.` : 'No bets have triggered yet today.'}</p>
+        </div>
+      `;
+    } else {
+      html = `<div class="cards-stack">${list.map(renderBetCard).join('')}</div>`;
+    }
+  } else if (activeFilter === 'watchlist') {
+    if (watchLegs.length === 0) {
+      html = `
+        <div class="empty-box">
+          <div class="empty-title">Watchlist Is Empty</div>
+          <p class="empty-sub">No upcoming picks are waiting right now. The scanner checks for new edges every 2 minutes.</p>
+        </div>
+      `;
+    } else {
+      html = `<div class="cards-stack">${watchLegs.map(renderBetCard).join('')}</div>`;
+    }
+  } else {
+    // 'all' view: Ready -> Placed -> Watchlist
+    if (readyLegs.length > 0) {
+      html += `
+        <section class="section-group">
+          <div class="section-hdr">
+            <span class="section-title"><span class="section-dot ready"></span>Ready to Place Now (${readyLegs.length})</span>
+            <span class="section-meta">Action ready</span>
+          </div>
+          <div class="cards-stack">${readyLegs.map(renderBetCard).join('')}</div>
+        </section>
+      `;
+    }
 
-    const sb = l.sniper_badges;
-    let sniperStripHtml = '';
-    if (sb) {
-      const steamChip = Number(sb.steam_bps || 0) >= 150
-        ? `<span class="s-chip steam">Fast Sharp Move</span>`
-        : (Number(sb.steam_bps || 0) > 0 ? `<span class="s-chip">Sharp Move</span>` : '');
-      const modeChip = sb.exec_mode === 'MULTIPOOL_SPLIT' && sb.split_count > 1
-        ? `<span class="s-chip pinn">${sb.split_count}-Pool Split</span>`
-        : '';
-      const gate = sb.ws11_gate || {};
-      let gateBannerHtml = '';
-      if (gate.decision) {
-        if (gate.fire_now) {
-          gateBannerHtml = `
-            <div class="sniper-gate-banner gate-fire">
-              <span>READY TO PLACE NOW (${gate.track_type === 'TYPE_2_FAST_STEAM' ? 'Big Fast Price Mistake' : 'Within 90 Mins of Start'})</span>
-              <span>Bet $${Number(sb.stake_usd || 9).toFixed(2)} (${Number(sb.stake_units || 0.6).toFixed(2)}u)</span>
-            </div>
-          `;
-        } else if (gate.decision === 'WAIT_FOR_T90M_LINEUP_LOCK') {
-          const relLbl = gate.t90m_release_time_est ? ` UNTIL ${gate.t90m_release_time_est}` : ' UNTIL 90 MINS BEFORE GAME';
-          gateBannerHtml = `
-            <div class="sniper-gate-banner gate-wait">
-              <span>WATCHLIST${relLbl}: Small +${Number(sb.net_ev_pct || 0).toFixed(2)}% discount right now - keeping your cash free until 90 mins before tip-off when lineups lock (unless it jumps to a huge +4.0% steal early)</span>
-            </div>
-          `;
-        }
-      }
-      sniperStripHtml = `
-        <div class="sniper-strip">
-          ${gateBannerHtml}
-          <div class="sniper-chips">
-            <span class="s-chip ev">+${Number(sb.net_ev_pct || 0).toFixed(2)}% Discount (+$${Number(sb.exp_ev_usd || 0).toFixed(2)} Exp Profit)</span>
-            <span class="s-chip pinn">${sb.pinn_quote} (${Number(sb.pinn_fair_pct || 0).toFixed(1)}% True Win Chance)</span>
-            ${steamChip}
-            ${modeChip}
-            <span class="s-chip">Pool $${Number(sb.pool_usd || 0).toLocaleString()} • Fee ${Number(sb.slip_pct || 0).toFixed(2)}%</span>
+    if (placedLegs.length > 0) {
+      const riskedToday = placedLegs.reduce((acc, x) => acc + Number(x.stake || 0), 0);
+      html += `
+        <section class="section-group">
+          <div class="section-hdr">
+            <span class="section-title"><span class="section-dot placed"></span>Placed Bets (${placedLegs.length})</span>
+            <span class="section-meta">$${riskedToday.toFixed(2)} risked (${(riskedToday / 15.0).toFixed(2)}u)</span>
           </div>
-          <div class="sniper-slip-note">
-            Overtime Payout: ${Number(sb.ot_odds || 0).toFixed(3)}x (${Number(sb.eff_odds || 0).toFixed(3)}x after pool fee)
-          </div>
+          <div class="cards-stack">${placedLegs.map(renderBetCard).join('')}</div>
+        </section>
+      `;
+    } else if (readyLegs.length === 0 && watchLegs.length > 0) {
+      html += `
+        <div class="quiet-notice">
+          <span>No bets placed yet today ($0.00 risked)</span>
+          <span style="color: var(--amber-bright); font-weight: 600;">${watchLegs.length} waiting on Watchlist below</span>
         </div>
       `;
     }
 
-    return `
-      <div class="leg-card status-${l.status}">
-        <div class="game-strip">
-          <div class="score-box">
-            ${isLive ? '<span class="live-dot"></span>' : ''}
-            <span>${l.game_score}</span>
+    if (watchLegs.length > 0) {
+      const plannedSum = watchLegs.reduce((acc, x) => acc + Number(x.stake || 0), 0);
+      html += `
+        <section class="section-group">
+          <div class="section-hdr">
+            <span class="section-title"><span class="section-dot watch"></span>Watchlist (${watchLegs.length})</span>
+            <span class="section-meta">Not bet yet · $${plannedSum.toFixed(2)} (${(plannedSum / 15.0).toFixed(2)}u) planned</span>
           </div>
-          <span class="clock-badge">${l.game_clock}</span>
-        </div>
-        <div class="row-top">
-          <div class="player-block">
-            <span class="player-name">${l.player}</span>
-            <div class="team-line">
-              <span class="team-tag">${l.team}</span>
-            </div>
-          </div>
-          <span class="pill pill-${l.status}">${l.badge}</span>
-        </div>
-        <div class="row-mid">
-          <span class="prop-name">${l.prop_label}</span>
-          <span class="stat-nums">${rightInfo}</span>
-        </div>
-        <div class="bar-container">
-          <div class="bar-track">
-            <div class="bar-fill fill-${l.status}" style="width: ${pctNum}%"></div>
-            <div class="bar-knob knob-${l.status}" style="left: ${knobPos}%">${l.current}</div>
-          </div>
-          <div class="bar-target ${l.status === 'hit' ? 'target-hit' : ''}">${l.target}</div>
-        </div>
-        ${sniperStripHtml}
-      </div>
-    `;
-  }).join('');
+          <div class="cards-stack">${watchLegs.map(renderBetCard).join('')}</div>
+        </section>
+      `;
+    }
+  }
+
+  container.innerHTML = html;
+  updateLiveTickers();
 }
 
 const ESPN_SPORT_PATH = {
@@ -1537,639 +1797,141 @@ async function updateLiveFromESPNInBrowser(payloadObj) {
   const ymd = dt.replace(/-/g, '');
   const allLegs = [];
   payloadObj.parlays.forEach(p => (p.legs || []).forEach(l => allLegs.push(l)));
-  if (allLegs.length === 0) return payloadObj;
-
   const sportsNeeded = [...new Set(allLegs.map(l => l.raw_sport).filter(sp => ESPN_SPORT_PATH[sp]))];
-  const gameMap = {};   // key: `${sp}_${tm}` -> { state, clock, scoreStr, ts, os, eventId }
-  const playerMap = {}; // key: `${sp}_${tm}_${normName}` -> { PTS, REB, AST, 3PM, PR, PA, RA, PRA, SOG, GOALS, REC, RECYDS, RUSHYDS, PASSYDS, RUSHREC }
 
+  const gameMap = {};
   for (const sp of sportsNeeded) {
     try {
-      const extraQuery = sp === 'NCAAB' ? '&groups=50&limit=500' : (sp === 'NCAAF' ? '&groups=80&limit=500' : '');
-      const sbUrl = `https://site.api.espn.com/apis/site/v2/sports/${ESPN_SPORT_PATH[sp]}/scoreboard?dates=${ymd}${extraQuery}&t=${Date.now()}`;
+      const q = sp === 'NCAAB' ? `&groups=50&limit=400` : '';
+      const sbUrl = `https://site.api.espn.com/apis/site/v2/sports/${ESPN_SPORT_PATH[sp]}/scoreboard?dates=${ymd}${q}&t=${Date.now()}`;
       const sbRes = await fetch(sbUrl);
       if (!sbRes.ok) continue;
       const sbJson = await sbRes.json();
-      const events = sbJson.events || [];
-      const activeEvents = [];
-
-      if (sp === 'ATP' || sp === 'WTA') {
-        for (const ev of events) {
-          for (const grp of (ev.groupings || [])) {
-            const gdn = String(grp.grouping?.displayName || '');
-            if (!gdn.includes('Singles')) continue;
-            for (const comp of (grp.competitions || [])) {
-              const compYmd = String(comp.date || '').slice(0, 10).replace(/-/g, '');
-              if (compYmd !== ymd) continue;
-              const cs = comp.competitors || [];
-              if (cs.length !== 2) continue;
-              const stType = comp.status?.type || {};
-              const state = stType.state || 'pre';
-              const shortDetail = stType.shortDetail || 'Scheduled';
-              const detFull = String(stType.detail || '').toLowerCase();
-              const ls0 = (cs[0].linescores || []).map(x => Number(x.value || 0));
-              const ls1 = (cs[1].linescores || []).map(x => Number(x.value || 0));
-              const isWalkover = detFull.includes('walkover') || shortDetail.toLowerCase().includes('walkover') || (state === 'post' && ls0.length === 0 && ls1.length === 0);
-              const names = cs.map(c => c.athlete?.displayName || '');
-              const nSets = Math.min(ls0.length, ls1.length);
-              let sets0 = 0, sets1 = 0;
-              for (let si = 0; si < nSets; si++) {
-                const g0 = ls0[si], g1 = ls1[si];
-                const doneSet = (state === 'post') || (si < nSets - 1) || ((g0 >= 6 || g1 >= 6) && Math.abs(g0 - g1) >= 2) || g0 === 7 || g1 === 7;
-                if (doneSet) {
-                  if (g0 > g1) sets0++;
-                  else if (g1 > g0) sets1++;
-                }
-              }
-              if (state === 'post' && !isWalkover) {
-                if (cs[0].winner && sets0 <= sets1) sets0 = Math.max(sets0, sets1 + 1, 2);
-                else if (cs[1].winner && sets1 <= sets0) sets1 = Math.max(sets1, sets0 + 1, 2);
-              }
-              const pairs = [[0, sets0, sets1, ls0, ls1], [1, sets1, sets0, ls1, ls0]];
-              for (const [idx, meS, oppS, meL, oppL] of pairs) {
-                const meName = names[idx];
-                const oppName = names[1 - idx];
-                const surname = (meName.trim().split(/\s+/).pop() || '').toUpperCase();
-                const setStr = meL.slice(0, Math.min(meL.length, oppL.length)).map((v, i) => `${v}-${oppL[i]}`).join(', ');
-                const scoreStr = isWalkover
-                  ? `${meName} vs ${oppName} (Walkover)`
-                  : (state === 'pre'
-                    ? `${meName} vs ${oppName}`
-                    : (state === 'post' ? `${meName} ${meS} - ${oppS} ${oppName}${setStr ? ' (' + setStr + ')' : ''}` : `${meName} ${meS}-${oppS} Sets${setStr ? ' (' + setStr + ')' : ''} vs ${oppName}`));
-                const clockLbl = isWalkover ? 'Walkover • Void' : (state === 'post' ? 'Final' : (state === 'pre' ? `Starts ${shortDetail}` : shortDetail));
-                const gDiff = (meL.length && oppL.length) ? (meL[meL.length - 1] - oppL[oppL.length - 1]) : 0;
-                gameMap[`${sp}_${surname}`] = { state, clock: clockLbl, scoreStr, ts: meS, os: oppS, setStr, gDiff, isTennis: true, isWalkover, elapsed: state === 'post' ? 1.0 : 0.5 };
-              }
-            }
-          }
-        }
-        continue;
-      }
-
-      for (const ev of events) {
+      for (const ev of (sbJson.events || [])) {
         const comp = (ev.competitions || [])[0];
         if (!comp) continue;
-        const stType = comp.status?.type || {};
-        const state = stType.state || 'pre'; // 'pre' | 'in' | 'post'
-        const shortDetail = stType.shortDetail || 'Scheduled';
-        const period = Number(comp.status?.period || 1);
-        const dispClock = String(comp.status?.displayClock || '');
-        let elapsed = state === 'post' ? 1.0 : 0.0;
-        if (state === 'in') {
-          let remMins = 0.0;
-          const detLow = shortDetail.toLowerCase();
-          if (!detLow.includes('halftime') && !detLow.includes('end of') && !detLow.includes('intermission')) {
-            const cm = dispClock.trim().match(/^(\d+):(\d+)/);
-            if (cm) remMins = Number(cm[1]) + Number(cm[2]) / 60.0;
-            else if (dispClock.trim()) remMins = (Number(dispClock) || 0) / 60.0;
-          }
-          const pLen = sp === 'NHL' ? 20.0 : (sp === 'NCAAB' ? 20.0 : ((sp === 'NFL' || sp === 'NCAAF') ? 15.0 : 12.0));
-          const totLen = sp === 'NHL' ? 60.0 : (sp === 'NCAAB' ? 40.0 : ((sp === 'NFL' || sp === 'NCAAF') ? 60.0 : 48.0));
-          const maxRegP = (sp === 'NHL') ? 3 : (sp === 'NCAAB' ? 2 : 4);
-          const elMins = (Math.min(Math.max(1, period), maxRegP) - 1) * pLen + Math.max(0.0, pLen - remMins);
-          elapsed = Math.max(0.02, Math.min(1.0, elMins / totLen));
-        }
+        const stObj = comp.status || ev.status || {};
+        const stType = stObj.type || {};
+        const state = stType.state || 'pre';
+        const shortDetail = stType.shortDetail || '';
         const competitors = comp.competitors || [];
-        if (competitors.length < 2) continue;
         const home = competitors.find(c => c.homeAway === 'home') || competitors[0];
         const away = competitors.find(c => c.homeAway === 'away') || competitors[1];
+        if (!home || !away) continue;
         const hAbbr = normTeam(sp, home.team?.abbreviation);
         const aAbbr = normTeam(sp, away.team?.abbreviation);
         const hName = home.team?.displayName || hAbbr;
         const aName = away.team?.displayName || aAbbr;
         const hScore = Number(home.score || 0);
         const aScore = Number(away.score || 0);
-        const scoreStr = state === 'pre'
-          ? `${aName} @ ${hName}`
-          : `${aName} ${aScore} - ${hScore} ${hName}`;
+        const scoreStr = state === 'pre' ? `${aName} @ ${hName}` : `${aName} ${aScore} - ${hScore} ${hName}`;
         const clockLbl = state === 'post' ? 'Final' : (state === 'pre' ? `Starts ${shortDetail.split(' - ').pop()}` : shortDetail);
-
-        gameMap[`${sp}_${hAbbr}`] = { state, clock: clockLbl, scoreStr, ts: hScore, os: aScore, tot: hScore + aScore, elapsed, eventId: ev.id };
-        gameMap[`${sp}_${aAbbr}`] = { state, clock: clockLbl, scoreStr, ts: aScore, os: hScore, tot: hScore + aScore, elapsed, eventId: ev.id };
-        gameMap[`ID_${ev.id}_HOME`] = { state, clock: clockLbl, scoreStr, ts: hScore, os: aScore, tot: hScore + aScore, elapsed, eventId: ev.id };
-        gameMap[`ID_${ev.id}_AWAY`] = { state, clock: clockLbl, scoreStr, ts: aScore, os: hScore, tot: hScore + aScore, elapsed, eventId: ev.id };
-
-        if (state === 'in' || state === 'post') {
-          const neededTeams = new Set(allLegs.filter(l => l.raw_sport === sp).map(l => normTeam(sp, l.raw_team)));
-          const neededIds = new Set(allLegs.filter(l => l.raw_sport === sp && l.espn_event_id).map(l => String(l.espn_event_id)));
-          if (neededIds.has(String(ev.id)) || neededTeams.has(hAbbr) || neededTeams.has(aAbbr)) {
-            activeEvents.push({ id: ev.id, hAbbr, aAbbr });
-          }
-        }
-      }
-
-      for (const evInfo of activeEvents) {
-        try {
-          const sumUrl = `https://site.api.espn.com/apis/site/v2/sports/${ESPN_SPORT_PATH[sp]}/summary?event=${evInfo.id}&t=${Date.now()}`;
-          const sumRes = await fetch(sumUrl);
-          if (!sumRes.ok) continue;
-          const sumJson = await sumRes.json();
-          const pGroups = sumJson.boxscore?.players || [];
-          for (const pg of pGroups) {
-            const tAbbr = normTeam(sp, pg.team?.abbreviation);
-            for (const stGrp of (pg.statistics || [])) {
-              const labels = (stGrp.labels || []).map(x => String(x).toUpperCase());
-              const catName = String(stGrp.name || '').toLowerCase();
-              for (const ath of (stGrp.athletes || [])) {
-                const disp = ath.athlete?.displayName || '';
-                const jersey = String(ath.athlete?.jersey || '');
-                // Disambiguate VAN Elias Pettersson (#40 C vs #25 D Elias N. Pettersson)
-                if (sp === 'NHL' && tAbbr === 'VAN' && disp.includes('Pettersson') && jersey === '25') {
-                  continue;
-                }
-                const pKey = `${sp}_${tAbbr}_${normPlayerName(disp)}`;
-                if (!playerMap[pKey]) playerMap[pKey] = {};
-                const stats = ath.stats || [];
-                const getVal = (lbl) => {
-                  const idx = labels.indexOf(lbl);
-                  if (idx < 0 || idx >= stats.length) return 0;
-                  const raw = String(stats[idx]);
-                  if (raw.includes('-')) return Number(raw.split('-')[0]) || 0;
-                  return Number(raw) || 0;
-                };
-                if (sp === 'NBA' || sp === 'NCAAB') {
-                  const pts = getVal('PTS');
-                  const reb = getVal('REB');
-                  const ast = getVal('AST');
-                  const tpm = getVal('3PT');
-                  playerMap[pKey].PTS = pts;
-                  playerMap[pKey].REB = reb;
-                  playerMap[pKey].AST = ast;
-                  playerMap[pKey]['3PM'] = tpm;
-                  playerMap[pKey].PR = pts + reb;
-                  playerMap[pKey].PA = pts + ast;
-                  playerMap[pKey].RA = reb + ast;
-                  playerMap[pKey].PRA = pts + reb + ast;
-                } else if (sp === 'NHL') {
-                  if (catName === 'goalies') continue;
-                  const g = getVal('G');
-                  const a = getVal('A');
-                  const sog = getVal('S'); // 'S' is Shots on Goal in ESPN NHL boxscores
-                  playerMap[pKey].GOALS = g;
-                  playerMap[pKey].AST = a;
-                  playerMap[pKey].PTS = g + a;
-                  playerMap[pKey].SOG = sog;
-                } else if (sp === 'NFL') {
-                  if (catName === 'passing') {
-                    playerMap[pKey].PASSYDS = getVal('YDS');
-                  } else if (catName === 'rushing') {
-                    playerMap[pKey].RUSHYDS = getVal('YDS');
-                  } else if (catName === 'receiving') {
-                    playerMap[pKey].REC = getVal('REC');
-                    playerMap[pKey].RECYDS = getVal('YDS');
-                  }
-                  playerMap[pKey].RUSHREC = (playerMap[pKey].RUSHYDS || 0) + (playerMap[pKey].RECYDS || 0);
-                  playerMap[pKey].PASSRUSH = (playerMap[pKey].PASSYDS || 0) + (playerMap[pKey].RUSHYDS || 0);
-                }
-              }
-            }
-          }
-        } catch (e) {}
+        gameMap[`ID_${ev.id}_HOME`] = { state, clock: clockLbl, scoreStr, ts: hScore, os: aScore, tot: hScore + aScore };
+        gameMap[`ID_${ev.id}_AWAY`] = { state, clock: clockLbl, scoreStr, ts: aScore, os: hScore, tot: hScore + aScore };
+        gameMap[`${sp}_${hAbbr}`] = { state, clock: clockLbl, scoreStr, ts: hScore, os: aScore, tot: hScore + aScore };
+        gameMap[`${sp}_${aAbbr}`] = { state, clock: clockLbl, scoreStr, ts: aScore, os: hScore, tot: hScore + aScore };
       }
     } catch (e) {}
   }
 
-  // Update each leg & recalculate parlay/day P&L
-  let dayNetTotal = 0;
-  let dayRiskTotal = 0;
-  let paperNetTotal = 0;
-  let paperRiskTotal = 0;
-  const isUnwageredSniper = Boolean(payloadObj.is_unwagered_vetted_card);
+  let placedNet = 0;
+  let placedRisk = 0;
+  let placedSettledRisk = 0;
+  let pw = 0, pl = 0, pp = 0, pOpen = 0;
 
   for (const p of payloadObj.parlays) {
     for (const l of (p.legs || [])) {
-      if (l.settled_fixed) continue;
       const sp = l.raw_sport;
       const tm = normTeam(sp, l.raw_team);
       const idKey = l.espn_event_id ? `ID_${l.espn_event_id}_${l.side_tag === 'AWAY' ? 'AWAY' : 'HOME'}` : '';
       const gInfo = (idKey && gameMap[idKey]) ? gameMap[idKey] : gameMap[`${sp}_${tm}`];
-      if (!gInfo) continue;
-
-      l.game_state = gInfo.state;
-      if (gInfo.state !== 'pre' || !l.start_label) {
-        l.game_clock = gInfo.clock;
+      if (gInfo) {
+        l.game_state = gInfo.state;
+        if (gInfo.state !== 'pre' || !l.start_label) l.game_clock = gInfo.clock;
+        l.game_score = gInfo.scoreStr;
+        if (l.raw_market === 'SP' && gInfo.state !== 'pre') {
+          const ln = Number(l.raw_line || 0);
+          const lnFmt = (ln >= 0 ? '+' : '') + ln.toFixed(1);
+          const cov = (gInfo.ts - gInfo.os) + ln;
+          if (gInfo.state === 'post') {
+            if (cov > 0) {
+              l.status = 'hit'; l.badge = 'Covered'; l.pct = 100; l.sub_stat = `Covered ${lnFmt}`;
+            } else if (Math.abs(cov) < 1e-6) {
+              l.status = 'yellow'; l.badge = 'Push'; l.is_void = true; l.pct = 100; l.sub_stat = `Push ${lnFmt}`;
+            } else {
+              l.status = 'red'; l.badge = 'Missed'; l.pct = 0; l.sub_stat = `Missed ${lnFmt}`;
+            }
+          } else {
+            const covFmt = (cov >= 0 ? '+' : '') + cov.toFixed(1);
+            l.status = cov > 0 ? 'green' : 'yellow';
+            l.badge = cov > 0 ? `Covering (${covFmt})` : `Behind (${covFmt})`;
+            l.pct = cov > 0 ? 75 : 35;
+            l.sub_stat = `Margin ${covFmt} on ${lnFmt}`;
+          }
+        }
       }
-      l.game_score = gInfo.scoreStr;
 
-      if (l.raw_market === 'ML') {
-        const ts = Number(gInfo.ts || 0);
-        const os = Number(gInfo.os || 0);
-        const isTen = Boolean(gInfo.isTennis);
-        const isWo = Boolean(gInfo.isWalkover);
-        const setStr = gInfo.setStr || '';
-        const gDiff = Number(gInfo.gDiff || 0);
-        if (isWo) {
-          l.current = 0;
-          l.target = 2;
-          l.remaining = 0;
-          l.pct = 100;
-          l.status = 'pre';
-          l.badge = 'Void ($15 Refund)';
-          l.risk_tier = 6;
-          l.is_void = true;
-          l.game_state = 'post';
-          l.sub_stat = 'Walkover • Ticket Refunded ($0.00 Net)';
-        } else if (gInfo.state === 'pre') {
-          l.current = 0;
-          l.target = isTen ? 2 : 1;
-          l.remaining = isTen ? 2 : 1;
-          l.pct = 0;
-          l.status = 'pre';
-          if (!l.sniper_badges) {
-            l.badge = 'Upcoming';
-            l.sub_stat = isTen ? 'Target: Win 2 Sets (ATP Moneyline)' : '2-Way Moneyline (Incl. OT/SO)';
-          }
-          l.risk_tier = 4;
-        } else if (gInfo.state === 'post') {
-          if (ts > os) {
-            l.current = ts;
-            l.target = isTen ? 2 : Math.max(1, ts);
-            l.remaining = 0;
-            l.pct = 100;
-            l.status = 'hit';
-            l.badge = 'Hit';
-            l.risk_tier = 6;
-            l.sub_stat = isTen ? `Won ${ts}-${os} Sets${setStr ? ' (' + setStr + ')' : ''}` : `Won ${ts}-${os}`;
-          } else {
-            l.current = ts;
-            l.target = isTen ? 2 : (os + 1);
-            l.remaining = Math.max(1, l.target - ts);
-            l.pct = 0;
-            l.status = 'red';
-            l.badge = 'Missed';
-            l.risk_tier = 5;
-            l.sub_stat = isTen ? `Lost ${ts}-${os} Sets${setStr ? ' (' + setStr + ')' : ''}` : `Lost ${ts}-${os}`;
-          }
+      if (l.bet_stage === 'PLACED') {
+        const st = Number(l.stake || 0);
+        const pay = Number(l.exact_payout || st);
+        placedRisk += st;
+        if (l.is_void) {
+          pp++;
+        } else if (l.status === 'hit' && isLegSettled(l)) {
+          placedNet += (pay - st);
+          placedSettledRisk += st;
+          pw++;
+        } else if (l.status === 'red' && isLegSettled(l)) {
+          placedNet -= st;
+          placedSettledRisk += st;
+          pl++;
         } else {
-          l.current = ts;
-          l.target = isTen ? 2 : (os + 1);
-          l.remaining = Math.max(0, l.target - l.current);
-          const diff = ts - os;
-          l.sub_stat = isTen ? `Sets ${ts}-${os}${setStr ? ' (' + setStr + ')' : ''}` : `Score Margin: ${diff >= 0 ? '+' : ''}${diff}`;
-          if (diff > 0 || (isTen && diff === 0 && gDiff > 0)) {
-            l.status = 'green';
-            l.badge = `Leading (${isTen && setStr ? setStr : ts + '-' + os})`;
-            l.pct = diff > 0 ? 75 : 60;
-            l.risk_tier = 2;
-          } else if (diff === 0 && (!isTen || gDiff === 0)) {
-            l.status = 'yellow';
-            l.badge = isTen ? `On Serve (${setStr || '0-0'})` : `Tied (${ts}-${os})`;
-            l.pct = 50;
-            l.risk_tier = 1;
-          } else {
-            l.status = 'yellow';
-            l.badge = `Trailing (${isTen && setStr ? setStr : ts + '-' + os})`;
-            l.pct = 25;
-            l.risk_tier = 1;
-          }
-        }
-      } else if (l.raw_market === 'SP') {
-        const ts = Number(gInfo.ts || 0);
-        const os = Number(gInfo.os || 0);
-        const ln = Number(l.raw_line || 0);
-        const lnFmt = (ln >= 0 ? '+' : '') + ln.toFixed(1);
-        const cov = (ts - os) + ln;
-        const neededPts = Math.max(0, Math.floor(os - ln) + 1);
-        if (gInfo.state === 'pre') {
-          l.current = 0;
-          l.target = lnFmt;
-          l.remaining = 0;
-          l.pct = 0;
-          l.status = 'pre';
-          if (!l.sniper_badges) {
-            l.badge = 'Upcoming';
-            l.sub_stat = `Spread Cushion: ${lnFmt} pts`;
-          }
-          l.risk_tier = 4;
-        } else if (gInfo.state === 'post') {
-          l.current = ts;
-          l.target = neededPts;
-          if (cov > 0) {
-            l.remaining = 0;
-            l.pct = 100;
-            l.status = 'hit';
-            l.badge = 'Covered';
-            l.risk_tier = 6;
-            l.sub_stat = `Covered ${lnFmt} (${ts}-${os})`;
-          } else if (Math.abs(cov) < 1e-6) {
-            l.remaining = 0;
-            l.pct = 100;
-            l.status = 'yellow';
-            l.badge = 'Push (Refund)';
-            l.is_void = true;
-            l.risk_tier = 6;
-            l.sub_stat = `Exact Push ${lnFmt} (${ts}-${os})`;
-          } else {
-            l.remaining = Math.max(1, neededPts - ts);
-            l.pct = 0;
-            l.status = 'red';
-            l.badge = 'Missed';
-            l.risk_tier = 5;
-            l.sub_stat = `Missed ${lnFmt} (${ts}-${os})`;
-          }
-        } else {
-          l.current = ts;
-          l.target = neededPts;
-          l.remaining = Math.max(0, neededPts - ts);
-          const covFmt = (cov >= 0 ? '+' : '') + cov.toFixed(1);
-          l.sub_stat = `Spread Margin: ${covFmt} (Line ${lnFmt})`;
-          if (cov > 0) {
-            l.status = 'green';
-            l.badge = `Covering (${covFmt})`;
-            l.pct = cov >= Math.abs(ln) ? 85 : 68;
-            l.risk_tier = 2;
-          } else {
-            l.status = 'yellow';
-            l.badge = `Behind (${covFmt})`;
-            l.pct = Math.max(15, Math.round((ts / Math.max(1, neededPts)) * 100));
-            l.risk_tier = 1;
-          }
-        }
-      } else if (l.raw_market === 'TOTAL') {
-        const totPts = Number(gInfo.tot !== undefined ? gInfo.tot : (Number(gInfo.ts || 0) + Number(gInfo.os || 0)));
-        const ln = Number(l.raw_line || 0);
-        const side = l.raw_side || 'O';
-        const sideWord = side === 'O' ? 'Over' : 'Under';
-        const unitW = (sp === 'NHL' || sp === 'SOCCER') ? 'Goals' : 'Pts';
-        const tgtOver = Math.floor(ln) + 1;
-        if (gInfo.state === 'pre') {
-          l.current = 0;
-          l.target = side === 'O' ? tgtOver : ln;
-          l.remaining = side === 'O' ? tgtOver : 0;
-          l.pct = 0;
-          l.status = 'pre';
-          if (!l.sniper_badges) {
-            l.badge = 'Upcoming';
-            l.sub_stat = `Game Total: ${sideWord} ${ln} ${unitW}`;
-          }
-          l.risk_tier = 4;
-        } else if (gInfo.state === 'post') {
-          l.current = totPts;
-          l.target = side === 'O' ? tgtOver : ln;
-          if ((side === 'O' && totPts > ln) || (side === 'U' && totPts < ln)) {
-            l.remaining = 0;
-            l.pct = 100;
-            l.status = 'hit';
-            l.badge = 'Hit';
-            l.risk_tier = 6;
-            l.sub_stat = `Total ${totPts} ${unitW} (${sideWord} ${ln})`;
-          } else if (Math.abs(totPts - ln) < 1e-6) {
-            l.remaining = 0;
-            l.pct = 100;
-            l.status = 'yellow';
-            l.badge = 'Push (Refund)';
-            l.is_void = true;
-            l.risk_tier = 6;
-            l.sub_stat = `Exact Push ${totPts} ${unitW}`;
-          } else {
-            l.remaining = side === 'O' ? Math.max(1, tgtOver - totPts) : 0;
-            l.pct = 0;
-            l.status = 'red';
-            l.badge = 'Missed';
-            l.risk_tier = 5;
-            l.sub_stat = `Total ${totPts} ${unitW} (${sideWord} ${ln})`;
-          }
-        } else {
-          l.current = totPts;
-          const el = Number(gInfo.elapsed || 0.25);
-          if (side === 'O') {
-            l.target = tgtOver;
-            l.remaining = Math.max(0, tgtOver - totPts);
-            l.pct = Math.min(100, Math.round((totPts / Math.max(1, tgtOver)) * 1000) / 10);
-            l.sub_stat = `Live Total: ${totPts} ${unitW} (Need ${tgtOver}+)`;
-            if (totPts > ln) {
-              l.status = 'hit';
-              l.badge = 'Hit (Over)';
-              l.risk_tier = 3;
-            } else if (totPts >= ln * Math.max(0.15, el) * 0.92) {
-              l.status = 'green';
-              l.badge = `On Pace (${totPts})`;
-              l.risk_tier = 2;
-            } else {
-              l.status = 'yellow';
-              l.badge = `Behind (${l.remaining} left)`;
-              l.risk_tier = 1;
-            }
-          } else {
-            l.target = ln;
-            const maxAllowed = Math.ceil(ln) - 1;
-            l.remaining = Math.max(0, maxAllowed - totPts);
-            l.sub_stat = `Live Total: ${totPts} ${unitW} (Max ${maxAllowed})`;
-            if (totPts > ln) {
-              l.status = 'red';
-              l.badge = 'Over (Lost)';
-              l.pct = 100;
-              l.risk_tier = 0;
-            } else {
-              l.pct = Math.min(100, Math.round((totPts / Math.max(1, ln)) * 1000) / 10);
-              if (totPts <= ln * Math.max(0.20, el) * 1.05) {
-                l.status = 'green';
-                l.badge = `Under Pace (${l.remaining} left)`;
-                l.risk_tier = 2;
-              } else {
-                l.status = 'yellow';
-                l.badge = `Tight (${l.remaining} left)`;
-                l.risk_tier = 1;
-              }
-            }
-          }
-        }
-      } else if (l.raw_player && l.raw_stat) {
-        const pKey = `${sp}_${tm}_${normPlayerName(l.raw_player)}`;
-        const pStats = playerMap[pKey];
-        const curVal = pStats && pStats[l.raw_stat] !== undefined ? Number(pStats[l.raw_stat]) : 0;
-        const ln = Number(l.raw_line);
-        const side = l.raw_side; // 'O' or 'U'
-        const sideWord = side === 'O' ? 'Over' : 'Under';
-
-        if (gInfo.state !== 'pre') {
-          l.current = curVal;
-          l.sub_stat = `${curVal} ${l.raw_stat} (${sideWord} ${ln})`;
-        }
-
-        if (gInfo.state === 'pre') {
-          l.status = 'pre';
-          if (!l.sniper_badges) {
-            l.badge = 'Upcoming';
-          }
-          l.risk_tier = 4;
-          l.pct = 0;
-        } else if (side === 'O') {
-          const tgt = Math.floor(ln) + 1;
-          l.target = tgt;
-          l.remaining = Math.max(0, tgt - curVal);
-          l.pct = Math.min(100, Math.round((curVal / Math.max(1, tgt)) * 1000) / 10);
-          if (curVal > ln) {
-            l.status = 'hit';
-            l.badge = 'Hit';
-            l.risk_tier = gInfo.state === 'in' ? 3 : 6;
-          } else if (gInfo.state === 'post') {
-            l.status = 'red';
-            l.badge = 'Missed';
-            l.risk_tier = 5;
-          } else {
-            const el = Number(gInfo.elapsed || 0.25);
-            const reqRate = tgt * el;
-            if (curVal >= reqRate * 0.80 || el < 0.20) {
-              l.status = 'green';
-              l.badge = 'On Pace';
-              l.risk_tier = 2;
-            } else {
-              l.status = 'yellow';
-              l.badge = `Behind Pace • ${tgt - curVal} to go`;
-              l.risk_tier = 1;
-            }
-          }
-        } else if (side === 'U') {
-          l.target = ln;
-          l.remaining = Math.max(0, Math.round((ln - curVal) * 10) / 10);
-          if (curVal > ln) {
-            l.status = 'red';
-            l.badge = gInfo.state === 'in' ? 'Over (Lost)' : 'Missed';
-            l.pct = 100;
-            l.risk_tier = gInfo.state === 'in' ? 0 : 5;
-          } else if (gInfo.state === 'post') {
-            l.status = 'hit';
-            l.badge = 'Hit';
-            l.pct = 100;
-            l.risk_tier = 6;
-          } else {
-            l.pct = Math.min(100, Math.round((curVal / Math.max(0.5, ln)) * 1000) / 10);
-            const el = Number(gInfo.elapsed || 0.25);
-            const maxAllowed = Math.floor(ln);
-            const remAllowed = maxAllowed - curVal;
-            const usedFrac = curVal / Math.max(0.5, ln);
-            const linPace = ln * Math.max(el, 0.18);
-            if (remAllowed === 0) {
-              l.status = 'yellow';
-              l.badge = `At Limit (${curVal})`;
-              l.risk_tier = 1;
-            } else if ((usedFrac >= 0.72 && el <= 0.75) || (curVal >= linPace * 1.38 && usedFrac >= 0.50)) {
-              l.status = 'yellow';
-              l.badge = `Danger • ${remAllowed} Left`;
-              l.risk_tier = 1;
-            } else if (curVal > linPace && (curVal >= 2 || usedFrac >= 0.40)) {
-              l.status = 'yellow';
-              l.badge = `Over Pace • ${remAllowed} Left`;
-              l.risk_tier = 1;
-            } else {
-              l.status = 'green';
-              l.badge = 'Under Pace';
-              l.risk_tier = 2;
-            }
-          }
+          pOpen++;
         }
       }
     }
-
-    // Recompute parlay/singles group net_val & profit_str using exact real-money stakes & payouts
-    const legs = p.legs || [];
-    if (p.id === 'P3' || p.id === 'EG') {
-      let sNet = 0;
-      let grpRisk = 0;
-      let sw = 0;
-      let sl = 0;
-      for (const l of legs) {
-        const stake = Number(l.stake ?? 20.0);
-        const odds = Number(l.raw_odds || 1.9);
-        const payout = l.exact_payout !== undefined ? Number(l.exact_payout) : stake * odds;
-        grpRisk += stake;
-        if (l.status === 'hit') {
-          sNet += (payout - stake);
-          sw++;
-        } else if (l.status === 'red' && (l.game_state === 'post' || l.raw_side === 'U')) {
-          sNet -= stake;
-          sl++;
-        }
-      }
-      if (isUnwageredSniper) {
-        p.risk_val = 0.0;
-        p.net_val = 0.0;
-        p.paper_risk_val = Math.round(grpRisk * 100) / 100;
-        p.paper_net_val = Math.round(sNet * 100) / 100;
-        paperRiskTotal += p.paper_risk_val;
-        paperNetTotal += p.paper_net_val;
-        if (sw + sl > 0) {
-          const pSign = p.paper_net_val >= 0 ? '+' : '-';
-          p.profit_str = `Paper ${pSign}$${Math.abs(p.paper_net_val).toFixed(2)}`;
-          p.name = `$${p.paper_risk_val.toFixed(2)} Vetted Float • ${sw}-${sl} Paper`;
-        } else {
-          const avgEv = Number(payloadObj.sniper_meta?.avg_net_ev_pct || 0);
-          const expProf = Number(payloadObj.sniper_meta?.expected_profit_usd || 0);
-          p.profit_str = `+${avgEv.toFixed(1)}% Avg EV`;
-          p.name = `$${p.paper_risk_val.toFixed(2)} Vetted Float • +$${expProf.toFixed(2)} Exp EV`;
-        }
-      } else {
-        p.risk_val = Math.round(grpRisk * 100) / 100;
-        p.net_val = Math.round(sNet * 100) / 100;
-        const sign = p.net_val >= 0 ? '+' : '-';
-        p.profit_str = `${sign}$${Math.abs(p.net_val).toFixed(2)}`;
-        const riskStr = p.risk_val % 1 === 0 ? p.risk_val.toFixed(0) : p.risk_val.toFixed(2);
-        p.name = `$${riskStr} Risk • ${sw}-${sl} Settled`;
-      }
-    } else if (legs.length >= 2) {
-      const pStake = Number(p.risk_val ?? 20.0);
-      const oComb = Math.round(legs.reduce((acc, l) => acc * Number(l.raw_odds || 1.9), 1.0) * 100) / 100;
-      const toRet = p.to_return !== undefined ? Number(p.to_return) : Math.round(pStake * oComb * 100) / 100;
-      const netP = Math.round((toRet - pStake) * 100) / 100;
-      if (legs.every(l => l.status === 'hit')) {
-        p.net_val = netP;
-        p.profit_str = `+$${netP.toFixed(2)}`;
-      } else if (legs.some(l => l.status === 'red' && (l.game_state === 'post' || l.raw_side === 'U'))) {
-        p.net_val = -pStake;
-        p.profit_str = `-$${pStake.toFixed(2)}`;
-      } else {
-        p.net_val = 0.0;
-        p.profit_str = `To Win +$${netP.toFixed(2)}`;
-      }
-    }
-    dayRiskTotal += Number(p.risk_val || 0);
-    dayNetTotal += Number(p.net_val || 0);
   }
 
-  if (isUnwageredSniper) {
-    payloadObj.day_risk = 0.0;
-    payloadObj.day_net = 0.0;
-    payloadObj.paper_risk = Math.round(paperRiskTotal * 100) / 100;
-    payloadObj.paper_net = Math.round(paperNetTotal * 100) / 100;
-  } else {
-    payloadObj.day_risk = Math.round(dayRiskTotal * 100) / 100;
-    payloadObj.day_net = Math.round(dayNetTotal * 100) / 100;
-  }
-  payloadObj.updated_at = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' });
-  if (Array.isArray(payloadObj.available_dates)) {
-    const dObj = payloadObj.available_dates.find(d => d.date === dt);
-    if (dObj) dObj.net = payloadObj.day_net;
+  payloadObj.day_risk = Math.round(placedRisk * 100) / 100;
+  payloadObj.day_net = Math.round(placedNet * 100) / 100;
+  if (payloadObj.scoreboard) {
+    payloadObj.scoreboard.day_net_usd = payloadObj.day_net;
+    payloadObj.scoreboard.day_net_units = Math.round((payloadObj.day_net / 15.0) * 100) / 100;
+    payloadObj.scoreboard.day_wins = pw;
+    payloadObj.scoreboard.day_losses = pl;
+    payloadObj.scoreboard.day_pushes = pp;
+    payloadObj.scoreboard.day_open = pOpen;
   }
   return payloadObj;
 }
 
-const isCloudStatic = location.hostname.endsWith('github.io');
-
 async function fetchDateJson(dt) {
   let json = null;
-  let usedStaticFallback = isCloudStatic;
-  if (!isCloudStatic) {
+  const isGh = location.hostname.endsWith('github.io');
+  usedStaticSource = isGh;
+  if (!isGh) {
     try {
       const res = await fetch('/api/live?date=' + encodeURIComponent(dt) + '&t=' + Date.now());
-      if (res.ok) {
-        const ct = res.headers.get('content-type') || '';
-        if (ct.includes('json')) {
-          json = await res.json();
+      if (res.ok && (res.headers.get('content-type') || '').includes('json')) {
+        json = await res.json();
+        if (json && json.server_epoch_ms) {
+          clockSkewMs = Number(json.server_epoch_ms) - Date.now();
         }
       }
     } catch (e) {
-      usedStaticFallback = true;
+      usedStaticSource = true;
     }
   }
-
   if (!json) {
-    usedStaticFallback = true;
-    const res2 = await fetch('api/live-' + encodeURIComponent(dt) + '.json?t=' + Date.now());
+    usedStaticSource = true;
+    let res2 = await fetch('api/live-' + encodeURIComponent(dt) + '.json?t=' + Date.now());
+    if (!res2.ok && dt !== '2026-11-14') {
+      activeDate = '2026-11-14';
+      res2 = await fetch('api/live-2026-11-14.json?t=' + Date.now());
+    }
     json = await res2.json();
   }
-
-  if (json && !json.settled_permanent && usedStaticFallback) {
+  if (json && !json.settled_permanent && usedStaticSource) {
     await updateLiveFromESPNInBrowser(json);
   }
   return json;
@@ -2178,50 +1940,42 @@ async function fetchDateJson(dt) {
 async function prefetchAllDates() {
   if (prefetchedAll) return;
   prefetchedAll = true;
-  const dates = Object.keys(DATE_LABELS);
+  const dates = (dataStore && dataStore.available_dates)
+    ? dataStore.available_dates.map(d => d.date)
+    : Object.keys(DATE_LABELS);
   for (const dt of dates) {
     if (dateCache[dt]) continue;
     try {
       const json = await fetchDateJson(dt);
-      if (json && json.parlays) {
-        dateCache[dt] = json;
-      }
+      if (json && json.parlays) dateCache[dt] = json;
     } catch (e) {}
   }
 }
 
 async function fetchLive(isManual) {
   const reqDt = activeDate;
-  if (!isManual && dateCache[reqDt] && dateCache[reqDt].settled_permanent) {
-    return; // Settled (>2h post-game) dates never need re-polling
-  }
+  if (!isManual && dateCache[reqDt] && dateCache[reqDt].settled_permanent) return;
   const mySeq = ++fetchSeq;
   const dot = document.getElementById('sync-dot');
-  const st = document.getElementById('sync-text');
-  if (dot && !dateCache[reqDt]) dot.classList.add('loading');
-  if (st && !dateCache[reqDt] && (isManual || !dataStore)) st.innerText = 'Loading...';
+  if (dot && !dateCache[reqDt]) dot.classList.add('syncing');
   try {
     const json = await fetchDateJson(reqDt);
-    if (json && json.parlays) {
-      dateCache[reqDt] = json;
-    }
+    if (json && json.parlays) dateCache[reqDt] = json;
     if (mySeq !== fetchSeq || activeDate !== reqDt) return;
     dataStore = json;
-    if (isManual) {
-      activeTab = getDefaultSinglesTab(dataStore);
-    }
-    if (st) st.innerText = dataStore.settled_permanent ? 'Settled Final' : ('Updated ' + dataStore.updated_at);
     render();
     prefetchAllDates();
   } catch (e) {
-    if (mySeq === fetchSeq && st && !dateCache[reqDt]) st.innerText = 'Reconnecting...';
+    const stEl = document.getElementById('engine-status-text');
+    if (mySeq === fetchSeq && stEl && !dataStore) stEl.innerText = 'Reconnecting to scanner...';
   } finally {
-    if (mySeq === fetchSeq && dot) dot.classList.remove('loading');
+    if (mySeq === fetchSeq && dot) dot.classList.remove('syncing');
   }
 }
 
 renderSkeletons();
-setInterval(() => fetchLive(false), 20000);
+setInterval(() => fetchLive(false), 15000);
+setInterval(updateLiveTickers, 1000);
 fetchLive(true);
 </script>
 </body>

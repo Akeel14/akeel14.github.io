@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Live Parlays</title>
+<title>Overtime 24/7 Singles Sniper</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
   :root {
     --bg: #090a0c;
     --card: #121418;
-    --card-border: rgba(255, 255, 255, 0.07);
+    --card-border: rgba(255, 255, 255, 0.08);
     --text: #f4f4f6;
     --muted: #8a8f98;
     --green: #10b981;
@@ -46,11 +46,16 @@
     max-width: 100vw;
   }
   body {
-    padding: 14px 12px 40px;
+    padding: 16px 14px 48px;
   }
   .wrap {
-    max-width: 480px;
+    max-width: 640px;
     margin: 0 auto;
+  }
+  @media (min-width: 600px) {
+    body {
+      padding: 24px 20px 60px;
+    }
   }
 
   /* Minimal Header + Custom Date Picker */
@@ -808,15 +813,16 @@
     margin-bottom: 6px;
   }
 
-  /* Phase-2 Uncapped Compounding & Sharp Pinnacle Sniper UI */
+  /* Phase-2 Uncapped Compounding & Sharp Pinnacle 24/7 Singles Sniper UI */
   .sniper-hero {
-    background: linear-gradient(160deg, rgba(16, 24, 36, 0.96), rgba(14, 18, 25, 0.98));
-    border: 1px solid rgba(56, 189, 248, 0.30);
-    border-radius: 14px;
-    padding: 13px 14px;
+    background: linear-gradient(160deg, rgba(16, 24, 36, 0.96), rgba(13, 17, 24, 0.99));
+    border: 1px solid rgba(56, 189, 248, 0.32);
+    border-radius: 15px;
+    padding: 15px 15px 14px;
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 11px;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
   }
   .sh-top {
     display: flex;
@@ -826,85 +832,153 @@
     flex-wrap: wrap;
   }
   .sh-tag {
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.35px;
+    letter-spacing: 0.3px;
     text-transform: uppercase;
     color: #38bdf8;
-    background: rgba(56, 189, 248, 0.13);
-    border: 1px solid rgba(56, 189, 248, 0.34);
-    padding: 3px 8px;
+    background: rgba(56, 189, 248, 0.14);
+    border: 1px solid rgba(56, 189, 248, 0.36);
+    padding: 3.5px 9px;
     border-radius: 99px;
   }
-  .sh-unwagered {
-    font-size: 10px;
+  .sh-wallet-pill {
+    font-size: 11px;
     font-weight: 700;
-    color: #fbbf24;
-    background: rgba(245, 158, 11, 0.13);
-    border: 1px solid rgba(245, 158, 11, 0.34);
-    padding: 3px 8px;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.13);
+    border: 1px solid rgba(16, 185, 129, 0.36);
+    padding: 3.5px 9px;
     border-radius: 99px;
+    font-variant-numeric: tabular-nums;
   }
   .sh-title {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 700;
     color: #f8fafc;
-    line-height: 1.3;
+    line-height: 1.32;
   }
   .sh-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  @media (min-width: 520px) {
+    .sh-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
   .sh-stat {
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 9px;
-    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.038);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    padding: 8px 10px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
   }
   .sh-stat-lbl {
-    font-size: 9.5px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.25px;
   }
   .sh-stat-val {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     color: #f1f5f9;
     font-variant-numeric: tabular-nums;
   }
   .sh-stat-val.pos { color: #34d399; }
   .sh-stat-val.sky { color: #7dd3fc; }
-  .sh-roadmap {
+  .sh-progress-box {
     background: rgba(16, 185, 129, 0.07);
-    border: 1px solid rgba(16, 185, 129, 0.22);
-    border-radius: 9px;
-    padding: 7px 9px;
-    font-size: 11px;
-    line-height: 1.42;
+    border: 1px solid rgba(16, 185, 129, 0.24);
+    border-radius: 10px;
+    padding: 9px 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sh-prog-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    font-weight: 600;
     color: #d1fae5;
+    font-variant-numeric: tabular-nums;
+  }
+  .sh-prog-top strong {
+    color: #34d399;
+  }
+  .sh-prog-track {
+    width: 100%;
+    height: 7px;
+    background: rgba(255, 255, 255, 0.09);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .sh-prog-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #38bdf8);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .sh-prog-note {
+    font-size: 11px;
+    line-height: 1.4;
+    color: #a7f3d0;
+  }
+  .sh-roadmap {
+    background: rgba(56, 189, 248, 0.07);
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 11px;
+    line-height: 1.44;
+    color: #e0f2fe;
   }
   .sh-roadmap strong {
-    color: #34d399;
+    color: #7dd3fc;
   }
   .sh-foot {
     font-size: 10.5px;
     color: var(--muted);
-    line-height: 1.35;
+    line-height: 1.38;
     font-variant-numeric: tabular-nums;
   }
   .sniper-strip {
-    margin-top: 10px;
-    padding-top: 9px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 11px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 7px;
+  }
+  .sniper-gate-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 9px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.35;
+    font-variant-numeric: tabular-nums;
+  }
+  .sniper-gate-banner.gate-fire {
+    background: rgba(16, 185, 129, 0.14);
+    border: 1px solid rgba(16, 185, 129, 0.38);
+    color: #6ee7b7;
+  }
+  .sniper-gate-banner.gate-wait {
+    background: rgba(245, 158, 11, 0.13);
+    border: 1px solid rgba(245, 158, 11, 0.36);
+    color: #fde68a;
   }
   .sniper-chips {
     display: flex;
@@ -914,7 +988,7 @@
   .s-chip {
     font-size: 10.5px;
     font-weight: 600;
-    padding: 2px 7px;
+    padding: 2.5px 7.5px;
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.05);
     color: #cbd5e1;
@@ -971,7 +1045,7 @@
         <button class="date-step disabled" aria-label="Previous month">‹</button>
         <div class="cal-month-wrap">
           <span class="cal-month">Nov 2026</span>
-          <span class="profit-chip neg" id="cal-total-chip">-$145.28 Total</span>
+          <span class="profit-chip pos" id="cal-total-chip">+$0.00 Fresh Start</span>
         </div>
         <button class="date-step disabled" aria-label="Next month">›</button>
       </div>
@@ -982,27 +1056,15 @@
     </div>
   </div>
 
-  <!-- Top Row: 2 Main Tabs (Singles | Parlays) -->
-  <div class="tabs">
-    <button class="tab active" id="cat-singles" onclick="selectCategory('singles')">
-      <span>Singles</span>
-      <span class="tab-sub" id="sub-cat-singles">Loading...</span>
-    </button>
-    <button class="tab" id="cat-parlays" onclick="selectCategory('parlays')">
-      <span>Parlays</span>
-      <span class="tab-sub" id="sub-cat-parlays">Loading...</span>
-    </button>
-  </div>
-
-  <!-- Second Row: Filter Pill Strip (Main Card / Morning Card OR Parlay 1 / Parlay 2 / Parlay 3) -->
-  <div class="sort-bar" id="sub-pills"></div>
+  <!-- Optional Sub-Filter Pill Strip when multiple singles windows exist -->
+  <div class="sort-bar" id="sub-pills" style="display: none;"></div>
 
   <div id="content" class="legs-list"></div>
 </div>
 
 <script>
-let activeCategory = 'singles'; // 'singles' or 'parlays'
-let activeTab = 'P3';           // 'P3' | 'EG' for singles; 'P1' | 'P2' | 'P4' for parlays
+let activeCategory = 'singles';
+let activeTab = 'P3';
 let activeDate = '2026-11-14';
 let dataStore = null;
 const dateCache = {};
@@ -1010,18 +1072,15 @@ let prefetchedAll = false;
 let fetchSeq = 0;
 
 const DATE_LABELS = {
-  '2026-11-07': 'Sat, Nov 7',
-  '2026-11-11': 'Wed, Nov 11',
-  '2026-11-12': 'Thu, Nov 12',
   '2026-11-14': 'Sat, Nov 14',
 };
-const STAKE_MAP = { P3: '8 Main Singles • $156.10 Staked', P1: 'Parlay 1 ($20 -> $72.87 @ 3.64x)', P2: 'Parlay 2 ($20 -> $62.36 @ 3.12x)' };
-const PROFIT_MAP = { P3: '+$116.64', P1: '+$52.87', P2: '+$42.36' };
+const STAKE_MAP = { P3: '24/7 Singles Sniper' };
+const PROFIT_MAP = { P3: '+$0.00' };
 
 function renderSkeletons() {
   const container = document.getElementById('content');
   if (!container) return;
-  container.innerHTML = [1, 2, 3, 4].map(() => `
+  container.innerHTML = [1, 2, 3].map(() => `
     <div class="skeleton-card">
       <div class="skel-line" style="width: 45%; margin-bottom: 12px;"></div>
       <div class="skel-line" style="width: 72%; height: 15px; margin-bottom: 10px;"></div>
@@ -1057,34 +1116,12 @@ function isLegSettled(l) {
   return false;
 }
 
-function isParlayDead(p) {
-  if (!p || !Array.isArray(p.legs) || p.legs.length === 0) return false;
-  if (Number(p.net_val || 0) < -0.005) return true;
-  return p.legs.some(l => l.status === 'red' && (l.game_state === 'post' || l.raw_side === 'U'));
-}
-
-function isParlayWon(p) {
-  if (!p || !Array.isArray(p.legs) || p.legs.length === 0) return false;
-  if (Number(p.net_val || 0) > 0.005 && p.legs.every(l => isLegSettled(l))) return true;
-  return p.legs.every(l => l.status === 'hit' || l.is_void || String(l.badge || '').includes('Void'));
-}
-
-function isParlayOpen(p) {
-  return Boolean(p && Array.isArray(p.legs) && p.legs.length > 0 && !isParlayDead(p) && !isParlayWon(p));
-}
-
 function getSinglesCardVisualClass(grp) {
   if (!grp || !Array.isArray(grp.legs) || grp.legs.length === 0) return 'pill-open';
   const hasOpen = grp.legs.some(l => !isLegSettled(l));
   const net = Number(grp.net_val || 0);
   if (!hasOpen && net < -0.005) return 'pill-lost';
   if (!hasOpen && net > 0.005) return 'pill-won';
-  return 'pill-open';
-}
-
-function getParlayVisualClass(p) {
-  if (isParlayDead(p)) return 'pill-lost';
-  if (isParlayWon(p)) return 'pill-won';
   return 'pill-open';
 }
 
@@ -1102,21 +1139,6 @@ function getDefaultSinglesTab(payloadObj) {
   return 'P3';
 }
 
-function getDefaultParlayTab(payloadObj) {
-  if (!payloadObj || !payloadObj.parlays) return 'P1';
-  const pMap = {};
-  payloadObj.parlays.forEach(p => { pMap[p.id] = p; });
-  const pList = ['P1', 'P2', 'P4'].map(id => pMap[id]).filter(p => p && Array.isArray(p.legs) && p.legs.length > 0);
-  if (pList.length === 0) return 'P1';
-  const liveOpen = pList.find(p => isParlayOpen(p) && p.legs.some(l => l.game_state === 'in'));
-  if (liveOpen) return liveOpen.id;
-  const firstOpen = pList.find(p => isParlayOpen(p));
-  if (firstOpen) return firstOpen.id;
-  const firstWon = pList.find(p => isParlayWon(p));
-  if (firstWon) return firstWon.id;
-  return pList[0].id;
-}
-
 function selectDate(dt) {
   if (!dt) return;
   activeDate = dt;
@@ -1126,10 +1148,9 @@ function selectDate(dt) {
   if (tr) tr.classList.remove('open');
   const lblEl = document.getElementById('date-label');
   if (lblEl && DATE_LABELS[dt]) lblEl.innerText = DATE_LABELS[dt];
-  // Instant 0ms switch if already cached in memory!
   if (dateCache[dt]) {
     dataStore = dateCache[dt];
-    activeTab = activeCategory === 'singles' ? getDefaultSinglesTab(dataStore) : getDefaultParlayTab(dataStore);
+    activeTab = getDefaultSinglesTab(dataStore);
     const st = document.getElementById('sync-text');
     if (st) st.innerText = dataStore.settled_permanent ? 'Settled Final' : ('Updated ' + dataStore.updated_at);
     render();
@@ -1153,33 +1174,6 @@ function stepDate(dir) {
   if (nextIdx >= 0 && nextIdx < avail.length) {
     selectDate(avail[nextIdx]);
   }
-}
-
-function selectCategory(cat) {
-  activeCategory = cat;
-  document.getElementById('cat-singles')?.classList.toggle('active', cat === 'singles');
-  document.getElementById('cat-parlays')?.classList.toggle('active', cat === 'parlays');
-  const pMap = {};
-  (dataStore?.parlays || []).forEach(p => { pMap[p.id] = p; });
-  if (cat === 'singles') {
-    if (activeTab !== 'P3' && activeTab !== 'EG') {
-      activeTab = getDefaultSinglesTab(dataStore);
-    } else {
-      const curGrp = pMap[activeTab];
-      const curHasOpen = curGrp && (curGrp.legs || []).some(l => !isLegSettled(l));
-      const defSingle = getDefaultSinglesTab(dataStore);
-      const defHasOpen = pMap[defSingle] && (pMap[defSingle].legs || []).some(l => !isLegSettled(l));
-      if (!curHasOpen && defHasOpen) activeTab = defSingle;
-    }
-  } else {
-    const validIds = ['P1', 'P2', 'P4'].filter(id => pMap[id] && (pMap[id].legs || []).length > 0);
-    if (!validIds.includes(activeTab)) {
-      activeTab = getDefaultParlayTab(dataStore);
-    } else if (isParlayDead(pMap[activeTab]) && validIds.some(id => isParlayOpen(pMap[id]))) {
-      activeTab = getDefaultParlayTab(dataStore);
-    }
-  }
-  render();
 }
 
 function selectSubTab(id) {
@@ -1236,7 +1230,7 @@ function render() {
       if (totChip) {
         const tSign = runningTotal >= 0 ? '+' : '-';
         totChip.className = 'profit-chip ' + (runningTotal >= 0 ? 'pos' : 'neg');
-        totChip.innerText = `${tSign}$${Math.abs(runningTotal).toFixed(2)} Wagered`;
+        totChip.innerText = `${tSign}$${Math.abs(runningTotal).toFixed(2)} Net`;
       }
       let cells = '';
       for (let day = 1; day <= 30; day++) {
@@ -1253,7 +1247,7 @@ function render() {
           let pnlTxt = isLocked ? '$0' : '-';
           if (isSniper && Math.abs(dNet) < 0.005) {
             pnlCls = 'pnl-snipe';
-            pnlTxt = 'SNIPE';
+            pnlTxt = 'LIVE';
           } else if (dNet > 0.005) {
             pnlCls = 'pnl-pos';
             pnlTxt = '+$' + Math.round(dNet);
@@ -1273,259 +1267,137 @@ function render() {
   (dataStore.parlays || []).forEach(p => { pMap[p.id] = p; });
   const isVettedUnwagered = Boolean(dataStore.is_unwagered_vetted_card);
 
-  // Update Top-Level Category Subtitles
   const p3Obj = pMap['P3'] || { legs: [], net_val: 0, profit_str: '+$0.00' };
   const egObj = pMap['EG'];
   const sLegsTotal = (p3Obj.legs?.length || 0) + (egObj?.legs?.length || 0);
-  const sHitsTotal = (p3Obj.legs || []).filter(l => l.status === 'hit').length + (egObj ? egObj.legs.filter(l => l.status === 'hit').length : 0);
-  const subSinglesEl = document.getElementById('sub-cat-singles');
-  if (subSinglesEl) {
-    const sOpenCnt = (p3Obj.legs || []).filter(l => !isLegSettled(l)).length + (egObj ? egObj.legs.filter(l => !isLegSettled(l)).length : 0);
-    if (isVettedUnwagered) {
-      const pNet = Number(dataStore.paper_net || 0);
-      const avgEv = Number(dataStore.sniper_meta?.avg_net_ev_pct || 0);
-      if (Math.abs(pNet) > 0.005 || sOpenCnt < sLegsTotal) {
-        const pSign = pNet >= 0 ? '+' : '-';
-        subSinglesEl.className = 'tab-sub' + (pNet < -0.005 ? ' sub-neg' : (pNet > 0.005 ? ' sub-pos' : ''));
-        subSinglesEl.innerText = `Paper ${pSign}$${Math.abs(pNet).toFixed(2)} • ${sOpenCnt} Open`;
-      } else {
-        subSinglesEl.className = 'tab-sub sub-pos';
-        subSinglesEl.innerText = `+${avgEv.toFixed(1)}% Avg EV • ${sLegsTotal} Vetted`;
-      }
-    } else {
-      const sNetComb = Math.round((Number(p3Obj.net_val || 0) + Number(egObj?.net_val || 0)) * 100) / 100;
-      const sSign = sNetComb >= 0 ? '+' : '-';
-      const sProfComb = `${sSign}$${Math.abs(sNetComb).toFixed(2)}`;
-      subSinglesEl.className = 'tab-sub' + (sNetComb < -0.005 ? ' sub-neg' : (sNetComb > 0.005 ? ' sub-pos' : ''));
-      subSinglesEl.innerText = sOpenCnt > 0
-        ? `${sProfComb} • ${sOpenCnt} Open`
-        : `${sProfComb} • ${sHitsTotal}/${sLegsTotal} Hits`;
-    }
-  }
 
-  const parlayIds = ['P1', 'P2', 'P4'].filter(id => pMap[id] && (pMap[id].legs || []).length > 0);
-  const subParlaysEl = document.getElementById('sub-cat-parlays');
-  if (subParlaysEl) {
-    if (parlayIds.length > 0) {
-      let totalParlayHits = 0;
-      let totalParlayLegs = 0;
-      let pNetComb = 0;
-      let openParlayCnt = 0;
-      let lostParlayCnt = 0;
-      parlayIds.forEach(id => {
-        const p = pMap[id];
-        const legs = p.legs || [];
-        totalParlayLegs += legs.length;
-        totalParlayHits += legs.filter(l => l.status === 'hit').length;
-        pNetComb += Number(p.net_val || 0);
-        if (isParlayOpen(p)) openParlayCnt++;
-        else if (isParlayDead(p)) lostParlayCnt++;
-      });
-      pNetComb = Math.round(pNetComb * 100) / 100;
-      subParlaysEl.className = 'tab-sub' + (pNetComb < -0.005 && openParlayCnt === 0 ? ' sub-neg' : (pNetComb > 0.005 ? ' sub-pos' : ''));
-      if (openParlayCnt > 0 && lostParlayCnt > 0) {
-        const pSign = pNetComb >= 0 ? '+' : '-';
-        subParlaysEl.innerText = `${openParlayCnt} Open • ${lostParlayCnt} Lost (${pSign}$${Math.abs(pNetComb).toFixed(0)})`;
-      } else if (openParlayCnt > 0) {
-        subParlaysEl.innerText = `${openParlayCnt} Open • ${totalParlayHits}/${totalParlayLegs} Legs`;
-      } else if (Math.abs(pNetComb) > 0.005) {
-        const pSign = pNetComb >= 0 ? '+' : '-';
-        subParlaysEl.innerText = `${pSign}$${Math.abs(pNetComb).toFixed(2)} • ${totalParlayHits}/${totalParlayLegs} Legs`;
-      } else {
-        subParlaysEl.innerText = `${parlayIds.length} Parlays • ${totalParlayHits}/${totalParlayLegs} Legs`;
-      }
-    } else {
-      subParlaysEl.className = 'tab-sub';
-      subParlaysEl.innerText = '0 Active Parlays';
-    }
-  }
+  if (activeTab === 'EG' && (!egObj || !(egObj.legs || []).length)) activeTab = 'P3';
+  else if (activeTab === 'P3' && !(p3Obj.legs || []).length && egObj && (egObj.legs || []).length) activeTab = 'EG';
+  if (activeTab !== 'P3' && activeTab !== 'EG') activeTab = getDefaultSinglesTab(dataStore);
 
-  // Ensure activeTab is valid for activeCategory
-  if (activeCategory === 'singles') {
-    if (activeTab === 'EG' && (!egObj || !(egObj.legs || []).length)) activeTab = 'P3';
-    else if (activeTab === 'P3' && !(p3Obj.legs || []).length && egObj && (egObj.legs || []).length) activeTab = 'EG';
-    if (activeTab !== 'P3' && activeTab !== 'EG') activeTab = getDefaultSinglesTab(dataStore);
-  } else {
-    if (!parlayIds.includes(activeTab)) {
-      activeTab = getDefaultParlayTab(dataStore);
-    }
-  }
-
-  // Render Second-Row Sub-Filter Pills
+  // Only show sub-pills if both Morning (EG) and Main (P3) exist
   const pillsEl = document.getElementById('sub-pills');
   if (pillsEl) {
-    if (sLegsTotal === 0 && parlayIds.length === 0) {
-      pillsEl.innerHTML = '';
-    } else if (activeCategory === 'singles') {
+    if (egObj && (egObj.legs || []).length > 0 && (p3Obj.legs || []).length > 0) {
+      pillsEl.style.display = 'flex';
+      const egHits = egObj.legs.filter(l => l.status === 'hit').length;
+      const egVis = getSinglesCardVisualClass(egObj);
       const mainHits = (p3Obj.legs || []).filter(l => l.status === 'hit').length;
-      const mainOpen = (p3Obj.legs || []).filter(l => !isLegSettled(l)).length;
-      const mainProf = p3Obj.profit_str || PROFIT_MAP['P3'] || '+$0.00';
       const mainVis = getSinglesCardVisualClass(p3Obj);
-      const mainNet = Number(p3Obj.net_val || 0);
-      const mainSubCls = mainVis === 'pill-open' ? (mainNet < -0.005 ? ' sub-neg' : (mainNet > 0.005 ? ' sub-pos' : '')) : '';
-      const mainPillTitle = p3Obj.pill_label || 'Main Card';
-      const mainStatusTxt = isVettedUnwagered
-        ? `${mainProf} • ${mainOpen > 0 ? mainOpen + ' Open' : mainHits + '/' + (p3Obj.legs || []).length}`
-        : ((mainOpen > 0 && mainHits === 0 && Math.abs(mainNet) < 0.005)
-          ? `${mainOpen} Open`
-          : `${mainProf} • ${mainHits}/${(p3Obj.legs || []).length}`);
-      let pillsHtml = '';
-      if (egObj && (egObj.legs || []).length > 0) {
-        const egHits = egObj.legs.filter(l => l.status === 'hit').length;
-        const egVis = getSinglesCardVisualClass(egObj);
-        const egNet = Number(egObj.net_val || 0);
-        const egSubCls = egVis === 'pill-open' ? (egNet < -0.005 ? ' sub-neg' : (egNet > 0.005 ? ' sub-pos' : '')) : '';
-        pillsHtml += `
-          <button class="sort-pill ${egVis} ${activeTab === 'EG' ? 'active' : ''}" onclick="selectSubTab('EG')">
-            <span>Morning Card (${egObj.legs.length})</span>
-            <span class="sort-pill-sub${egSubCls}">${egObj.profit_str || ''} • ${egHits}/${egObj.legs.length}</span>
-          </button>
-        `;
-      }
-      pillsHtml += `
+      pillsEl.innerHTML = `
+        <button class="sort-pill ${egVis} ${activeTab === 'EG' ? 'active' : ''}" onclick="selectSubTab('EG')">
+          <span>Morning Singles (${egObj.legs.length})</span>
+          <span class="sort-pill-sub">${egObj.profit_str || ''} • ${egHits}/${egObj.legs.length}</span>
+        </button>
         <button class="sort-pill ${mainVis} ${activeTab === 'P3' ? 'active' : ''}" onclick="selectSubTab('P3')">
-          <span>${mainPillTitle} (${(p3Obj.legs || []).length})</span>
-          <span class="sort-pill-sub${mainSubCls}">${mainStatusTxt}</span>
+          <span>Main Singles (${(p3Obj.legs || []).length})</span>
+          <span class="sort-pill-sub">${p3Obj.profit_str || ''} • ${mainHits}/${(p3Obj.legs || []).length}</span>
         </button>
       `;
-      pillsEl.innerHTML = pillsHtml;
     } else {
-      if (parlayIds.length === 0) {
-        pillsEl.innerHTML = '';
-      } else {
-        pillsEl.innerHTML = parlayIds.map((pid, idx) => {
-          const p = pMap[pid];
-          const hits = (p.legs || []).filter(l => l.status === 'hit').length;
-          const pVis = getParlayVisualClass(p);
-          const pTitle = p.label || `Parlay ${idx + 1}`;
-          const prof = pVis === 'pill-lost'
-            ? `Lost ${p.profit_str || ''}`
-            : (p.profit_str || PROFIT_MAP[pid] || '');
-          return `
-            <button class="sort-pill ${pVis} ${activeTab === pid ? 'active' : ''}" onclick="selectSubTab('${pid}')">
-              <span>${pTitle}</span>
-              <span class="sort-pill-sub">${prof} • ${hits}/${(p.legs || []).length}</span>
-            </button>
-          `;
-        }).join('');
-      }
+      pillsEl.style.display = 'none';
+      pillsEl.innerHTML = '';
     }
   }
 
   const container = document.getElementById('content');
-  const parlay = activeCategory === 'parlays' ? pMap[activeTab] : (pMap[activeTab] || p3Obj);
+  const activeGroup = pMap[activeTab] || p3Obj;
   const bs = document.getElementById('bet-summary');
   if (bs) {
-    if (sLegsTotal === 0 && parlayIds.length === 0) {
-      bs.innerHTML = `<span>No Picks Locked Yet</span>`;
+    const sm = dataStore.sniper_meta || {};
+    const onchainUsd = Number(sm.onchain_usdc_usd || 215.09);
+    const onchainU = Number(sm.onchain_units || 14.34);
+    if (sLegsTotal === 0) {
+      bs.innerHTML = `<span>$${onchainUsd.toFixed(2)} USDC (${onchainU.toFixed(2)}u)</span><span class="profit-chip snipe">Scanning 24/7</span>`;
     } else if (isVettedUnwagered) {
       const pRisk = Number(dataStore.paper_risk || 0);
       const pNet = Number(dataStore.paper_net || 0);
-      const expUsd = Number(dataStore.sniper_meta?.expected_profit_usd || 0);
-      const avgEv = Number(dataStore.sniper_meta?.avg_net_ev_pct || 0);
+      const expUsd = Number(sm.expected_profit_usd || 0);
+      const avgEv = Number(sm.avg_net_ev_pct || 0);
       const anySettled = (p3Obj.legs || []).some(l => isLegSettled(l));
       if (anySettled || Math.abs(pNet) > 0.005) {
         const pSign = pNet >= 0 ? '+' : '-';
         const cCls = pNet >= 0 ? 'pos' : 'neg';
-        bs.innerHTML = `<span>$${pRisk.toFixed(2)} Vetted Float</span><span class="profit-chip ${cCls}">Paper ${pSign}$${Math.abs(pNet).toFixed(2)}</span>`;
+        bs.innerHTML = `<span>$${onchainUsd.toFixed(2)} Float • $${pRisk.toFixed(2)} Card</span><span class="profit-chip ${cCls}">${pSign}$${Math.abs(pNet).toFixed(2)}</span>`;
       } else {
-        bs.innerHTML = `<span>$${pRisk.toFixed(2)} Vetted Float ($0 Wagered)</span><span class="profit-chip snipe">+$${expUsd.toFixed(2)} EV (+${avgEv.toFixed(1)}%)</span>`;
+        bs.innerHTML = `<span>$${onchainUsd.toFixed(2)} Float (${onchainU.toFixed(2)}u)</span><span class="profit-chip snipe">${sLegsTotal} Vetted (+${avgEv.toFixed(1)}% EV)</span>`;
       }
     } else {
-      const dayRisk = Number(dataStore.day_risk ?? parlay?.risk_val ?? 0);
-      const dayNet = Number(dataStore.day_net ?? parlay?.net_val ?? 0);
+      const dayRisk = Number(dataStore.day_risk ?? activeGroup?.risk_val ?? 0);
+      const dayNet = Number(dataStore.day_net ?? activeGroup?.net_val ?? 0);
       const chipCls = dayNet >= 0 ? 'pos' : 'neg';
       const netSign = dayNet >= 0 ? '+' : '-';
-      const netFmt = `${netSign}$${Math.abs(dayNet).toFixed(2)} Net`;
-      const riskFmt = dayRisk % 1 === 0 ? `$${dayRisk.toFixed(0)} Risk` : `$${dayRisk.toFixed(2)} Risk`;
-      bs.innerHTML = `<span>${riskFmt}</span><span class="profit-chip ${chipCls}">${netFmt}</span>`;
+      bs.innerHTML = `<span>$${dayRisk.toFixed(2)} Staked</span><span class="profit-chip ${chipCls}">${netSign}$${Math.abs(dayNet).toFixed(2)} Net</span>`;
     }
   }
 
-  const rawLegs = (parlay && parlay.legs) ? parlay.legs : [];
-  if (rawLegs.length === 0) {
-    if (activeCategory === 'parlays' && isVettedUnwagered) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <strong>100% Pure Singles Routing Active (WS10 Champion C3)</strong>
-          Cross-game 2-leg parlays are strictly quarantined unless combined Overtime V2 AMM vig is &lt;= 4.9% (0 parlays qualified on ${DATE_LABELS[activeDate] || activeDate}). Switch to Singles to view all vetted Pinnacle sniper picks.
-        </div>
-      `;
-      return;
-    }
-    container.innerHTML = `
-      <div class="empty-state">
-        <strong>No Picks Locked Yet for ${DATE_LABELS[activeDate] || activeDate}</strong>
-        We wait for the full morning sportsbook board (~10:30 AM EST) and complete our forensic analysis before locking any plays.
-      </div>
-    `;
-    return;
-  }
-
+  const rawLegs = (activeGroup && activeGroup.legs) ? activeGroup.legs : [];
   let bannerHtml = '';
-  if (activeCategory === 'singles' && dataStore.sniper_meta) {
+  if (dataStore.sniper_meta) {
     const sm = dataStore.sniper_meta;
-    const scaleTxt = sm.scale_10k_deployed_usd > 0
-      ? ` • At $10k BR: $${Number(sm.scale_10k_deployed_usd).toFixed(0)} Multi-Pool Split (+$${Number(sm.scale_10k_exp_profit_usd).toFixed(2)} EV)`
-      : '';
+    const onchainUsd = Number(sm.onchain_usdc_usd || 215.09);
+    const onchainU = Number(sm.onchain_units || 14.34);
+    const gasUsd = Number(sm.eth_gas_usd || 7.98);
+    const unitUsd = Number(sm.unit_stake_usd || 15.0);
+    const prTarget = Number(sm.principal_target_usd || 750.0);
+    const prPct = Math.min(100, Math.max(0, Number(sm.principal_progress_pct || 28.7)));
+    const fireCnt = Number(sm.fire_now_count || 0);
+    const waitCnt = Number(sm.waiting_t90m_count || 0);
     bannerHtml = `
       <div class="sniper-hero">
         <div class="sh-top">
-          <span class="sh-tag">Pinnacle + Overtime V2 Sniper</span>
-          <span class="sh-unwagered">Not Wagered ($0 Real Risk)</span>
+          <span class="sh-tag">Overtime V2 + Pinnacle 24/7 Singles Sniper</span>
+          <span class="sh-wallet-pill">$${onchainUsd.toFixed(2)} USDC (${onchainU.toFixed(2)}u) • $${gasUsd.toFixed(2)} ETH Gas</span>
         </div>
-        <div class="sh-title">C3 Uncapped 0.30x Empirical Kelly [1.8%-3.3%] + 15% DD Ratchet</div>
+        <div class="sh-title">C3 Uncapped 0.30x Empirical Kelly ($500 Ref BR, 1u = $${unitUsd.toFixed(0)}) + P11 Dual-Track 24/7 Gate</div>
         <div class="sh-grid">
           <div class="sh-stat">
-            <span class="sh-stat-lbl">Working Float</span>
-            <span class="sh-stat-val sky">$${Number(sm.working_float_usd || 0).toFixed(2)}</span>
+            <span class="sh-stat-lbl">Live On-Chain Float</span>
+            <span class="sh-stat-val sky">$${onchainUsd.toFixed(2)} (${onchainU.toFixed(2)}u)</span>
           </div>
           <div class="sh-stat">
-            <span class="sh-stat-lbl">Off-Chain Rsv</span>
-            <span class="sh-stat-val">$${Number(sm.offchain_reserve_usd || 0).toFixed(2)}</span>
+            <span class="sh-stat-lbl">Base Unit (3% Ref)</span>
+            <span class="sh-stat-val">$${unitUsd.toFixed(2)} (0.6u-1.1u)</span>
           </div>
           <div class="sh-stat">
-            <span class="sh-stat-lbl">Expected EV</span>
-            <span class="sh-stat-val pos">+$${Number(sm.expected_profit_usd || 0).toFixed(2)} (+${Number(sm.avg_net_ev_pct || 0).toFixed(1)}%)</span>
+            <span class="sh-stat-lbl">Today Vetted Stake</span>
+            <span class="sh-stat-val">$${Number(sm.working_float_usd || 0).toFixed(2)} (${fireCnt} Fire / ${waitCnt} Hold)</span>
+          </div>
+          <div class="sh-stat">
+            <span class="sh-stat-lbl">Expected Card EV</span>
+            <span class="sh-stat-val pos">+$${Number(sm.expected_profit_usd || 0).toFixed(2)} (+${Number(sm.avg_net_ev_pct || 0).toFixed(2)}%)</span>
+          </div>
+        </div>
+        <div class="sh-progress-box">
+          <div class="sh-prog-top">
+            <span><strong>Principal Recovery Milestone:</strong> $${onchainUsd.toFixed(2)} / $${prTarget.toFixed(0)} On-Chain Goal</span>
+            <strong>${prPct.toFixed(1)}%</strong>
+          </div>
+          <div class="sh-prog-track">
+            <div class="sh-prog-fill" style="width: ${prPct}%"></div>
+          </div>
+          <div class="sh-prog-note">
+            At <strong>$${prTarget.toFixed(0)}</strong> on-chain equity (85d median, 73.0% of paths need 0 top-ups), withdraw 100% of your $${onchainUsd.toFixed(2)} principal and compound pure house profit to $10k -> $25k+.
           </div>
         </div>
         <div class="sh-roadmap">
-          <strong>House-Money Plan:</strong> Fund only today's $${Number(sm.working_float_usd || 0).toFixed(2)} float ($500 ref BR). At <strong>$1,000</strong> (26d med), withdraw your full $500 principal -> compound 100% house money to <strong>$10k</strong> (155d med) -> <strong>$25k</strong> (239d med, 0.00% ruin) -> $100k+ multi-venue.
+          <strong>P11 Dual-Track 24/7 Hurdle:</strong> Type-2 Fast Steam (&gt;=150 bps) fires 24/7 at &gt;=+3.50% EV • Type-1 Props/Sides fire inside T-90m at &gt;=+2.25% EV (or &gt;240m at &gt;=+4.00% Giant Edge) • Last-3u Reserve requires &gt;=+3.75% EV.
         </div>
         <div class="sh-foot">
-          Scanned ${Number(sm.ot_markets_scanned || 0).toLocaleString()} Overtime mkts vs ${Number(sm.pinn_markets_indexed || 0).toLocaleString()} live Pinnacle mkts • Blocked ${Number(sm.hard_blocks_triggered || 0).toLocaleString()} vig/trap lines${scaleTxt}
+          Scanned ${Number(sm.ot_markets_scanned || 0).toLocaleString()} Overtime V2 AMM mkts vs ${Number(sm.pinn_markets_indexed || 0).toLocaleString()} live Pinnacle mkts • Blocked ${Number(sm.hard_blocks_triggered || 0).toLocaleString()} high-vig/trap lines
         </div>
       </div>
     `;
-  } else if (activeCategory === 'parlays' && parlay) {
-    const pStake = Number(parlay.risk_val ?? 15.0);
-    const oComb = parlay.odds_comb
-      ? Number(parlay.odds_comb)
-      : Math.round(rawLegs.reduce((acc, l) => acc * Number(l.raw_odds || 1.9), 1.0) * 100) / 100;
-    const toRet = parlay.to_return !== undefined
-      ? Number(parlay.to_return)
-      : Math.round(pStake * oComb * 100) / 100;
-    const pIdx = parlayIds.indexOf(activeTab);
-    const bTitle = `${parlay.label || ('Parlay ' + (pIdx >= 0 ? pIdx + 1 : 1))}${oComb ? ' • ' + oComb.toFixed(2) + 'x' : ''}`;
-    const bSub = `$${pStake.toFixed(2)} Stake -> $${toRet.toFixed(2)} Payout`;
-    let bCls = 'open';
-    let bBadge = `OPEN • To Win +$${Math.max(0, toRet - pStake).toFixed(2)}`;
-    if (isParlayDead(parlay)) {
-      bCls = 'lost';
-      bBadge = `LOST -$${pStake.toFixed(2)}`;
-    } else if (isParlayWon(parlay)) {
-      bCls = 'won';
-      bBadge = `WON +$${Math.max(0, toRet - pStake).toFixed(2)}`;
-    }
-    bannerHtml = `
-      <div class="parlay-banner ${bCls}">
-        <div class="pb-left">
-          <span class="pb-title">${bTitle}</span>
-          <span class="pb-sub">${bSub}</span>
-        </div>
-        <span class="pb-badge ${bCls}">${bBadge}</span>
+  }
+
+  if (rawLegs.length === 0) {
+    container.innerHTML = bannerHtml + `
+      <div class="empty-state">
+        <strong>No Active Singles Above Hurdle Right Now (${DATE_LABELS[activeDate] || activeDate})</strong>
+        The 24/7 Pinnacle + Overtime V2 daemon is scanning every 120 seconds across NBA, NCAAB, NHL, NFL, NCAAF, Tennis, and Tier-1 Soccer.
       </div>
     `;
+    return;
   }
 
   const sortedLegs = sortLegsByRisk(rawLegs);
@@ -1542,13 +1414,33 @@ function render() {
     let sniperStripHtml = '';
     if (sb) {
       const steamChip = Number(sb.steam_bps || 0) >= 150
-        ? `<span class="s-chip steam">+${Number(sb.steam_bps).toFixed(0)} bps Steam</span>`
-        : '';
+        ? `<span class="s-chip steam">+${Number(sb.steam_bps).toFixed(0)} bps Fast Steam</span>`
+        : (Number(sb.steam_bps || 0) > 0 ? `<span class="s-chip">+${Number(sb.steam_bps).toFixed(0)} bps Steam</span>` : '');
       const modeChip = sb.exec_mode === 'MULTIPOOL_SPLIT' && sb.split_count > 1
         ? `<span class="s-chip pinn">${sb.split_count}-Pool Split</span>`
         : '';
+      const gate = sb.ws11_gate || {};
+      let gateBannerHtml = '';
+      if (gate.decision) {
+        if (gate.fire_now) {
+          gateBannerHtml = `
+            <div class="sniper-gate-banner gate-fire">
+              <span>READY TO FIRE NOW (${gate.track_type === 'TYPE_2_FAST_STEAM' ? 'Type-2 24/7 Steam' : 'T-90m Active Window'})</span>
+              <span>Stake $${Number(sb.stake_usd || 9).toFixed(2)} (${Number(sb.stake_units || 0.6).toFixed(2)}u)</span>
+            </div>
+          `;
+        } else if (gate.decision === 'WAIT_FOR_T90M_LINEUP_LOCK') {
+          const relLbl = gate.t90m_release_time_est ? ` until ${gate.t90m_release_time_est} (T-90m)` : ' until T-90m';
+          gateBannerHtml = `
+            <div class="sniper-gate-banner gate-wait">
+              <span>HOLD FLOAT${relLbl}: +${Number(sb.net_ev_pct || 0).toFixed(2)}% EV (Early &gt;240m requires &gt;=+${Number(gate.required_hurdle_ev_pct || 4.0).toFixed(2)}% or releases at T-90m &gt;=+2.25%)</span>
+            </div>
+          `;
+        }
+      }
       sniperStripHtml = `
         <div class="sniper-strip">
+          ${gateBannerHtml}
           <div class="sniper-chips">
             <span class="s-chip ev">+${Number(sb.net_ev_pct || 0).toFixed(2)}% Net EV (+$${Number(sb.exp_ev_usd || 0).toFixed(2)})</span>
             <span class="s-chip pinn">${sb.pinn_quote} (${Number(sb.pinn_fair_pct || 0).toFixed(1)}% Fair)</span>
@@ -1557,7 +1449,7 @@ function render() {
             <span class="s-chip">Pool $${Number(sb.pool_usd || 0).toLocaleString()} • Cap $${Number(sb.cap_usd || 0).toFixed(0)} • Slip ${Number(sb.slip_pct || 0).toFixed(2)}%</span>
           </div>
           <div class="sniper-slip-note">
-            Overtime Quote: ${Number(sb.ot_odds || 0).toFixed(3)}x (Eff ${Number(sb.eff_odds || 0).toFixed(3)}x) • Slip pos=${sb.slip_pos}, market line=${sb.slip_raw_line}
+            Overtime Quote: ${Number(sb.ot_odds || 0).toFixed(3)}x (Eff ${Number(sb.eff_odds || 0).toFixed(3)}x) • Single Slip pos=${sb.slip_pos}, line=${sb.slip_raw_line}
           </div>
         </div>
       `;
@@ -2316,7 +2208,7 @@ async function fetchLive(isManual) {
     if (mySeq !== fetchSeq || activeDate !== reqDt) return;
     dataStore = json;
     if (isManual) {
-      activeTab = activeCategory === 'singles' ? getDefaultSinglesTab(dataStore) : getDefaultParlayTab(dataStore);
+      activeTab = getDefaultSinglesTab(dataStore);
     }
     if (st) st.innerText = dataStore.settled_permanent ? 'Settled Final' : ('Updated ' + dataStore.updated_at);
     render();

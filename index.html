@@ -1349,42 +1349,42 @@ function render() {
           <span class="sh-tag">Overtime V2 + Pinnacle 24/7 Singles Sniper</span>
           <span class="sh-wallet-pill">$${onchainUsd.toFixed(2)} USDC (${onchainU.toFixed(2)}u) • $${gasUsd.toFixed(2)} ETH Gas</span>
         </div>
-        <div class="sh-title">C3 Uncapped 0.30x Empirical Kelly ($500 Ref BR, 1u = $${unitUsd.toFixed(0)}) + P11 Dual-Track 24/7 Gate</div>
+        <div class="sh-title">24/7 Smart Singles Bot ($${unitUsd.toFixed(0)} Base Bet • $9 to $17 Per Play)</div>
         <div class="sh-grid">
           <div class="sh-stat">
-            <span class="sh-stat-lbl">Live On-Chain Float</span>
+            <span class="sh-stat-lbl">Wallet Balance</span>
             <span class="sh-stat-val sky">$${onchainUsd.toFixed(2)} (${onchainU.toFixed(2)}u)</span>
           </div>
           <div class="sh-stat">
-            <span class="sh-stat-lbl">Base Unit (3% Ref)</span>
-            <span class="sh-stat-val">$${unitUsd.toFixed(2)} (0.6u-1.1u)</span>
+            <span class="sh-stat-lbl">Base Bet Size</span>
+            <span class="sh-stat-val">$${unitUsd.toFixed(2)} ($9-$17 range)</span>
           </div>
           <div class="sh-stat">
-            <span class="sh-stat-lbl">Today Vetted Stake</span>
-            <span class="sh-stat-val">$${Number(sm.working_float_usd || 0).toFixed(2)} (${fireCnt} Fire / ${waitCnt} Hold)</span>
+            <span class="sh-stat-lbl">Today's Picks</span>
+            <span class="sh-stat-val">$${Number(sm.working_float_usd || 0).toFixed(2)} (${fireCnt} Ready / ${waitCnt} Watchlist)</span>
           </div>
           <div class="sh-stat">
-            <span class="sh-stat-lbl">Expected Card EV</span>
+            <span class="sh-stat-lbl">Expected Profit Edge</span>
             <span class="sh-stat-val pos">+$${Number(sm.expected_profit_usd || 0).toFixed(2)} (+${Number(sm.avg_net_ev_pct || 0).toFixed(2)}%)</span>
           </div>
         </div>
         <div class="sh-progress-box">
           <div class="sh-prog-top">
-            <span><strong>Principal Recovery Milestone:</strong> $${onchainUsd.toFixed(2)} / $${prTarget.toFixed(0)} On-Chain Goal</span>
+            <span><strong>Get Your Deposit Back Goal:</strong> $${onchainUsd.toFixed(2)} / $${prTarget.toFixed(0)} Wallet Balance</span>
             <strong>${prPct.toFixed(1)}%</strong>
           </div>
           <div class="sh-prog-track">
             <div class="sh-prog-fill" style="width: ${prPct}%"></div>
           </div>
           <div class="sh-prog-note">
-            At <strong>$${prTarget.toFixed(0)}</strong> on-chain equity (85d median, 73.0% of paths need 0 top-ups), withdraw 100% of your $${onchainUsd.toFixed(2)} principal and compound pure house profit to $10k -> $25k+.
+            Once your wallet reaches <strong>$${prTarget.toFixed(0)}</strong>, cash out 100% of the money you put in and grow pure house profit from there toward $10k -&gt; $25k+.
           </div>
         </div>
         <div class="sh-roadmap">
-          <strong>P11 Dual-Track 24/7 Hurdle:</strong> Type-2 Fast Steam (&gt;=150 bps) fires 24/7 at &gt;=+3.50% EV • Type-1 Props/Sides fire inside T-90m at &gt;=+2.25% EV (or &gt;240m at &gt;=+4.00% Giant Edge) • Last-3u Reserve requires &gt;=+3.75% EV.
+          <strong>How the 24/7 Filter Protects Your Cash:</strong> Big sudden price mistakes are grabbed right away 24/7 • Smaller early discounts wait on the Watchlist until 90 mins before game time (after lineups come out, so your cash isn't locked up all day) • Your last $45 is saved strictly for A+ slam-dunk deals.
         </div>
         <div class="sh-foot">
-          Scanned ${Number(sm.ot_markets_scanned || 0).toLocaleString()} Overtime V2 AMM mkts vs ${Number(sm.pinn_markets_indexed || 0).toLocaleString()} live Pinnacle mkts • Blocked ${Number(sm.hard_blocks_triggered || 0).toLocaleString()} high-vig/trap lines
+          Scanned ${Number(sm.ot_markets_scanned || 0).toLocaleString()} Overtime lines vs ${Number(sm.pinn_markets_indexed || 0).toLocaleString()} live Pinnacle lines • Filtered out ${Number(sm.hard_blocks_triggered || 0).toLocaleString()} bad/overpriced lines
         </div>
       </div>
     `;
@@ -1393,8 +1393,8 @@ function render() {
   if (rawLegs.length === 0) {
     container.innerHTML = bannerHtml + `
       <div class="empty-state">
-        <strong>No Active Singles Above Hurdle Right Now (${DATE_LABELS[activeDate] || activeDate})</strong>
-        The 24/7 Pinnacle + Overtime V2 daemon is scanning every 120 seconds across NBA, NCAAB, NHL, NFL, NCAAF, Tennis, and Tier-1 Soccer.
+        <strong>No Plays Ready Right Now (${DATE_LABELS[activeDate] || activeDate})</strong>
+        Scanning Pinnacle vs Overtime every 2 minutes across NBA, College Basketball, NHL, NFL, College Football, Tennis, and Soccer.
       </div>
     `;
     return;
@@ -1414,8 +1414,8 @@ function render() {
     let sniperStripHtml = '';
     if (sb) {
       const steamChip = Number(sb.steam_bps || 0) >= 150
-        ? `<span class="s-chip steam">+${Number(sb.steam_bps).toFixed(0)} bps Fast Steam</span>`
-        : (Number(sb.steam_bps || 0) > 0 ? `<span class="s-chip">+${Number(sb.steam_bps).toFixed(0)} bps Steam</span>` : '');
+        ? `<span class="s-chip steam">Fast Sharp Move</span>`
+        : (Number(sb.steam_bps || 0) > 0 ? `<span class="s-chip">Sharp Move</span>` : '');
       const modeChip = sb.exec_mode === 'MULTIPOOL_SPLIT' && sb.split_count > 1
         ? `<span class="s-chip pinn">${sb.split_count}-Pool Split</span>`
         : '';
@@ -1425,15 +1425,15 @@ function render() {
         if (gate.fire_now) {
           gateBannerHtml = `
             <div class="sniper-gate-banner gate-fire">
-              <span>READY TO FIRE NOW (${gate.track_type === 'TYPE_2_FAST_STEAM' ? 'Type-2 24/7 Steam' : 'T-90m Active Window'})</span>
-              <span>Stake $${Number(sb.stake_usd || 9).toFixed(2)} (${Number(sb.stake_units || 0.6).toFixed(2)}u)</span>
+              <span>READY TO PLACE NOW (${gate.track_type === 'TYPE_2_FAST_STEAM' ? 'Big Fast Price Mistake' : 'Within 90 Mins of Start'})</span>
+              <span>Bet $${Number(sb.stake_usd || 9).toFixed(2)} (${Number(sb.stake_units || 0.6).toFixed(2)}u)</span>
             </div>
           `;
         } else if (gate.decision === 'WAIT_FOR_T90M_LINEUP_LOCK') {
-          const relLbl = gate.t90m_release_time_est ? ` until ${gate.t90m_release_time_est} (T-90m)` : ' until T-90m';
+          const relLbl = gate.t90m_release_time_est ? ` UNTIL ${gate.t90m_release_time_est}` : ' UNTIL 90 MINS BEFORE GAME';
           gateBannerHtml = `
             <div class="sniper-gate-banner gate-wait">
-              <span>HOLD FLOAT${relLbl}: +${Number(sb.net_ev_pct || 0).toFixed(2)}% EV (Early &gt;240m requires &gt;=+${Number(gate.required_hurdle_ev_pct || 4.0).toFixed(2)}% or releases at T-90m &gt;=+2.25%)</span>
+              <span>WATCHLIST${relLbl}: Small +${Number(sb.net_ev_pct || 0).toFixed(2)}% discount right now - keeping your cash free until 90 mins before tip-off when lineups lock (unless it jumps to a huge +4.0% steal early)</span>
             </div>
           `;
         }
@@ -1442,14 +1442,14 @@ function render() {
         <div class="sniper-strip">
           ${gateBannerHtml}
           <div class="sniper-chips">
-            <span class="s-chip ev">+${Number(sb.net_ev_pct || 0).toFixed(2)}% Net EV (+$${Number(sb.exp_ev_usd || 0).toFixed(2)})</span>
-            <span class="s-chip pinn">${sb.pinn_quote} (${Number(sb.pinn_fair_pct || 0).toFixed(1)}% Fair)</span>
+            <span class="s-chip ev">+${Number(sb.net_ev_pct || 0).toFixed(2)}% Discount (+$${Number(sb.exp_ev_usd || 0).toFixed(2)} Exp Profit)</span>
+            <span class="s-chip pinn">${sb.pinn_quote} (${Number(sb.pinn_fair_pct || 0).toFixed(1)}% True Win Chance)</span>
             ${steamChip}
             ${modeChip}
-            <span class="s-chip">Pool $${Number(sb.pool_usd || 0).toLocaleString()} • Cap $${Number(sb.cap_usd || 0).toFixed(0)} • Slip ${Number(sb.slip_pct || 0).toFixed(2)}%</span>
+            <span class="s-chip">Pool $${Number(sb.pool_usd || 0).toLocaleString()} • Fee ${Number(sb.slip_pct || 0).toFixed(2)}%</span>
           </div>
           <div class="sniper-slip-note">
-            Overtime Quote: ${Number(sb.ot_odds || 0).toFixed(3)}x (Eff ${Number(sb.eff_odds || 0).toFixed(3)}x) • Single Slip pos=${sb.slip_pos}, line=${sb.slip_raw_line}
+            Overtime Payout: ${Number(sb.ot_odds || 0).toFixed(3)}x (${Number(sb.eff_odds || 0).toFixed(3)}x after pool fee)
           </div>
         </div>
       `;
